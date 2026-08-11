@@ -2,359 +2,1518 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NOVA Currency - أسعار العملات</title>
-    <meta name="description" content="أسعار العملات وتحويل العملات ومتابعة تغير أسعار الصرف.">
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#147BFF">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA RATE - أسعار العملات</title>
+    <style>
+        /* ============================
+           CSS VARIABLES & RESET
+           ============================ */
+        :root {
+            --primary: #147BFF;
+            --secondary: #6C4DFF;
+            --dark: #0B1220;
+            --white: #FFFFFF;
+            --success: #18C77A;
+            --error: #FF4D5E;
+            --bg: #F0F2F5;
+            --card-bg: #FFFFFF;
+            --text: #0B1220;
+            --text-secondary: #6B7280;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    <link rel="stylesheet" href="../src/css/style.css">
-    <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --bg: #0B1220;
+            --card-bg: #1A2332;
+            --text: #FFFFFF;
+            --text-secondary: #9CA3AF;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+            line-height: 1.6;
+        }
+
+        /* ============================
+           SCROLLBAR STYLING
+           ============================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* ============================
+           CONTAINER
+           ============================ */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ============================
+           HEADER
+           ============================ */
+        header {
+            background: var(--card-bg);
+            padding: 16px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: -1px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .logo small {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: 0;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 15px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        nav a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Header Controls */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle {
+            background: var(--bg);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-login {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-login:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(20, 123, 255, 0.4);
+        }
+
+        /* Mobile Menu */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text);
+            padding: 4px;
+        }
+
+        /* ============================
+           HERO SECTION
+           ============================ */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: var(--radius);
+            padding: 60px 40px;
+            margin: 30px 0;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 60%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transform: rotate(15deg);
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .hero h1 .highlight {
+            color: #FFD700;
+        }
+
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 25px;
+            position: relative;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 36px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        /* ============================
+           SEARCH BAR
+           ============================ */
+        .search-section {
+            margin: 30px 0 20px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 8px 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 4px 25px rgba(20, 123, 255, 0.15);
+        }
+
+        .search-box .icon {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-left: 12px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px 0;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            color: var(--text);
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-box .clear-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            display: none;
+        }
+
+        .search-box .clear-btn.visible {
+            display: block;
+        }
+
+        /* ============================
+           SECTION HEADER
+           ============================ */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .section-header h2 .badge {
+            background: var(--primary);
+            color: white;
+            font-size: 14px;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-right: 8px;
+        }
+
+        .section-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 2px solid var(--text-secondary);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            font-size: 13px;
+        }
+
+        .filter-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .filter-btn:hover:not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ============================
+           CURRENCIES GRID
+           ============================ */
+        .currencies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0 40px;
+        }
+
+        .currency-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .currency-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary);
+        }
+
+        .currency-card .favorite-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: #D1D5DB;
+        }
+
+        .currency-card .favorite-btn.active {
+            color: #FBBF24;
+        }
+
+        .currency-card .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .currency-card .top-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .currency-card .flag {
+            font-size: 40px;
+        }
+
+        .currency-card .info .name {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .currency-card .info .code {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .currency-card .rates {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 12px 0 14px;
+        }
+
+        .currency-card .rate-item {
+            background: var(--bg);
+            padding: 10px 14px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .currency-card .rate-item .label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .currency-card .rate-item .value {
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        .currency-card .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--bg);
+        }
+
+        .currency-card .change {
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .currency-card .change.positive {
+            color: var(--success);
+        }
+
+        .currency-card .change.negative {
+            color: var(--error);
+        }
+
+        .currency-card .updated-at {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ============================
+           CONVERTER SECTION
+           ============================ */
+        .converter-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin: 30px 0;
+        }
+
+        .converter-section h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .converter-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .converter-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        .converter-group input,
+        .converter-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--bg);
+            border-radius: 12px;
+            font-size: 16px;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .converter-group input:focus,
+        .converter-group select:focus {
+            border-color: var(--primary);
+            background: var(--card-bg);
+        }
+
+        .converter-group input {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .converter-swap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .converter-swap button {
+            background: var(--primary);
+            border: none;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .converter-swap button:hover {
+            transform: rotate(180deg);
+            box-shadow: 0 4px 15px rgba(20, 123, 255, 0.4);
+        }
+
+        .converter-result {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .converter-result .amount {
+            font-size: 36px;
+            font-weight: 900;
+        }
+
+        .converter-result .detail {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        /* ============================
+           MODAL
+           ============================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--bg);
+        }
+
+        .modal-header .title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .modal-close {
+            background: var(--bg);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text);
+        }
+
+        .modal-close:hover {
+            background: var(--error);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .modal-body .detail-row .label {
+            color: var(--text-secondary);
+        }
+
+        .modal-body .detail-row .value {
+            font-weight: 600;
+        }
+
+        /* ============================
+           TOAST NOTIFICATIONS
+           ============================ */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            animation: toastSlideIn 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            min-width: 250px;
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--error);
+        }
+
+        .toast.info {
+            background: var(--primary);
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ============================
+           RESPONSIVE
+           ============================ */
+        @media (max-width: 992px) {
+            .converter-grid {
+                grid-template-columns: 1fr;
+            }
+            .currencies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            nav {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                padding: 20px 0 10px;
+                gap: 4px;
+            }
+
+            nav.open {
+                display: flex;
+            }
+
+            nav a {
+                width: 100%;
+                text-align: center;
+                padding: 12px;
+            }
+
+            .header-controls {
+                gap: 8px;
+            }
+
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+
+            .currencies-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .converter-section {
+                padding: 20px;
+            }
+
+            .converter-result .amount {
+                font-size: 28px;
+            }
+
+            .modal {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .toast-container {
+                right: 16px;
+                bottom: 16px;
+                left: 16px;
+            }
+
+            .toast {
+                min-width: unset;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            .currency-card .rates {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .currency-card .rate-item .value {
+                font-size: 15px;
+            }
+        }
+
+        /* ============================
+           UTILITY
+           ============================ */
+        .text-center {
+            text-align: center;
+        }
+        .mt-20 {
+            margin-top: 20px;
+        }
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
+    <!-- ============================
+    HEADER
+    ============================ -->
+    <header>
+        <div class="container">
+            <a href="#" class="logo">
+                NOVA <span>RATE</span>
+                <small>💱</small>
+            </a>
 
-    <!-- 1. SPLASH SCREEN -->
-    <div id="splash-screen" class="splash-container">
-        <div class="splash-content">
-            <div class="splash-logo-wrapper">
-                <span class="splash-nova">NOVA</span>
+            <button class="hamburger" id="hamburger" aria-label="القائمة">☰</button>
+
+            <nav id="mainNav">
+                <a href="#" class="active">الرئيسية</a>
+                <a href="#currencies">الأسعار</a>
+                <a href="#converter">المحول</a>
+                <a href="#favorites">المفضلة</a>
+            </nav>
+
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي">
+                    🌙
+                </button>
+                <button class="btn-login" id="loginBtn">🔑 تسجيل الدخول</button>
             </div>
-            <h1 class="splash-title">NOVA Currency</h1>
-            <p class="splash-tagline">SMART SOLUTIONS, BETTER LIFE</p>
-            <div class="loader"></div>
+        </div>
+    </header>
+
+    <!-- ============================
+    MAIN CONTENT
+    ============================ -->
+    <main class="container">
+
+        <!-- ===== HERO ===== -->
+        <section class="hero">
+            <h1>NOVA <span class="highlight">RATE</span></h1>
+            <p>أسعار العملات في مكان واحد</p>
+            <p style="font-size: 16px; max-width: 520px;">
+                تابع أسعار العملات بسهولة، وقارن أسعار الشراء والبيع، واستخدم محول العملات في ثوانٍ.
+            </p>
+            <div class="hero-buttons">
+                <a href="#currencies" class="btn btn-primary">📊 عرض الأسعار</a>
+                <a href="#converter" class="btn btn-secondary">🔄 تحويل العملات</a>
+            </div>
+        </section>
+
+        <!-- ===== SEARCH ===== -->
+        <section class="search-section">
+            <div class="search-box">
+                <span class="icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="ابحث عن عملة... (الاسم، الرمز، البلد)">
+                <button class="clear-btn" id="clearSearch">✕</button>
+            </div>
+        </section>
+
+        <!-- ===== CURRENCIES ===== -->
+        <section id="currencies">
+            <div class="section-header">
+                <h2>
+                    💰 أسعار العملات
+                    <span class="badge" id="currencyCount">10</span>
+                </h2>
+                <div class="section-controls">
+                    <button class="filter-btn active" data-filter="all">الكل</button>
+                    <button class="filter-btn" data-filter="favorites">⭐ المفضلة</button>
+                </div>
+            </div>
+
+            <div class="currencies-grid" id="currenciesGrid">
+                <!-- يتم التحميل عبر JavaScript -->
+            </div>
+        </section>
+
+        <!-- ===== CONVERTER ===== -->
+        <section id="converter" class="converter-section">
+            <h2>🔄 محول العملات</h2>
+            <div class="converter-grid">
+                <div class="converter-group">
+                    <label>المبلغ</label>
+                    <input type="number" id="converterAmount" value="100" step="any" min="0">
+                </div>
+                <div class="converter-group">
+                    <label>من</label>
+                    <select id="converterFrom">
+                        <!-- يتم التحميل عبر JavaScript -->
+                    </select>
+                </div>
+                <div class="converter-swap">
+                    <button id="swapCurrencies">⇄</button>
+                </div>
+                <div class="converter-group">
+                    <label>إلى</label>
+                    <select id="converterTo">
+                        <!-- يتم التحميل عبر JavaScript -->
+                    </select>
+                </div>
+                <div class="converter-group full-width">
+                    <label>نوع السعر</label>
+                    <select id="converterPriceType">
+                        <option value="buy">سعر الشراء</option>
+                        <option value="sell">سعر البيع</option>
+                    </select>
+                </div>
+                <div class="converter-group full-width">
+                    <label>السوق</label>
+                    <select id="converterMarket">
+                        <option value="official">السوق الرسمي</option>
+                        <option value="parallel">السوق الموازي</option>
+                    </select>
+                </div>
+                <div class="converter-result full-width" id="converterResult">
+                    <div class="amount" id="convertedAmount">0.00</div>
+                    <div class="detail" id="convertedDetail">SDG</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================
+    MODAL - Currency Details
+    ============================ -->
+    <div class="modal-overlay" id="currencyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="title">
+                    <span id="modalFlag">🇺🇸</span>
+                    <span id="modalName">USD</span>
+                </div>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- يتم التحميل عبر JavaScript -->
+            </div>
         </div>
     </div>
 
-    <!-- 2. MAIN APP CONTAINER -->
-    <div id="app" class="app-container" style="display: none;">
-        
-        <!-- HEADER -->
-        <header class="app-header">
-            <button class="menu-btn" id="menuBtn" aria-label="القائمة">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-            <div class="header-brand">
-                <span class="brand-nova">NOVA</span> <span class="brand-currency">Currency</span>
-            </div>
-            <div class="header-actions">
-                <button class="search-btn" id="searchBtn" aria-label="بحث" onclick="APP.navigate('search')">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </button>
-                <button class="refresh-btn" id="refreshBtn" aria-label="تحديث" onclick="APP.refreshRates()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                </button>
-            </div>
-        </header>
+    <!-- ============================
+    TOAST CONTAINER
+    ============================ -->
+    <div class="toast-container" id="toastContainer"></div>
 
-        <!-- MAIN CONTENT AREA (SPA ROUTES) -->
-        <main class="main-content" id="appContent">
-            
-            <!-- ================= HOME PAGE ================= -->
-            <section id="page-home" class="page-section active">
-                <div class="update-card">
-                    <div class="update-info">
-                        <span class="update-label">آخر تحديث</span>
-                        <span class="update-date" id="lastUpdateDate">20 مايو 2024 - ص 10:30</span>
+    <!-- ============================
+    JAVASCRIPT
+    ============================ -->
+    <script type="module">
+        // =============================================
+        // 1. DATA
+        // =============================================
+        const currenciesData = [{
+            id: 'usd',
+            code: 'USD',
+            name: 'الدولار الأمريكي',
+            flag: '🇺🇸',
+            country: 'الولايات المتحدة',
+            official: { buy: 1680, sell: 1700 },
+            parallel: { buy: 1850, sell: 1880 },
+            change: 2.4,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'eur',
+            code: 'EUR',
+            name: 'اليورو',
+            flag: '🇪🇺',
+            country: 'الاتحاد الأوروبي',
+            official: { buy: 1850, sell: 1875 },
+            parallel: { buy: 2050, sell: 2080 },
+            change: -1.2,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'gbp',
+            code: 'GBP',
+            name: 'الجنيه الإسترليني',
+            flag: '🇬🇧',
+            country: 'المملكة المتحدة',
+            official: { buy: 2150, sell: 2180 },
+            parallel: { buy: 2380, sell: 2410 },
+            change: 0.8,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'sar',
+            code: 'SAR',
+            name: 'الريال السعودي',
+            flag: '🇸🇦',
+            country: 'السعودية',
+            official: { buy: 448, sell: 452 },
+            parallel: { buy: 495, sell: 500 },
+            change: 0.3,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'aed',
+            code: 'AED',
+            name: 'الدرهم الإماراتي',
+            flag: '🇦🇪',
+            country: 'الإمارات',
+            official: { buy: 457, sell: 461 },
+            parallel: { buy: 505, sell: 510 },
+            change: -0.5,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'egp',
+            code: 'EGP',
+            name: 'الجنيه المصري',
+            flag: '🇪🇬',
+            country: 'مصر',
+            official: { buy: 54, sell: 55 },
+            parallel: { buy: 60, sell: 61 },
+            change: 1.5,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'qar',
+            code: 'QAR',
+            name: 'الريال القطري',
+            flag: '🇶🇦',
+            country: 'قطر',
+            official: { buy: 461, sell: 465 },
+            parallel: { buy: 510, sell: 515 },
+            change: 0.1,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'kwd',
+            code: 'KWD',
+            name: 'الدينار الكويتي',
+            flag: '🇰🇼',
+            country: 'الكويت',
+            official: { buy: 5480, sell: 5520 },
+            parallel: { buy: 6000, sell: 6050 },
+            change: 0.6,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'try',
+            code: 'TRY',
+            name: 'الليرة التركية',
+            flag: '🇹🇷',
+            country: 'تركيا',
+            official: { buy: 52, sell: 53 },
+            parallel: { buy: 58, sell: 59 },
+            change: -2.1,
+            updatedAt: new Date().toLocaleString('ar')
+        }, {
+            id: 'cny',
+            code: 'CNY',
+            name: 'اليوان الصيني',
+            flag: '🇨🇳',
+            country: 'الصين',
+            official: { buy: 232, sell: 235 },
+            parallel: { buy: 256, sell: 260 },
+            change: 0.4,
+            updatedAt: new Date().toLocaleString('ar')
+        }];
+
+        // =============================================
+        // 2. STATE
+        // =============================================
+        let currentCurrencyData = [...currenciesData];
+        let favorites = JSON.parse(localStorage.getItem('nova_favorites') || '[]');
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        // =============================================
+        // 3. DOM REFS
+        // =============================================
+        const grid = document.getElementById('currenciesGrid');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        const themeToggle = document.getElementById('themeToggle');
+        const hamburger = document.getElementById('hamburger');
+        const mainNav = document.getElementById('mainNav');
+        const modal = document.getElementById('currencyModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalFlag = document.getElementById('modalFlag');
+        const modalName = document.getElementById('modalName');
+        const modalBody = document.getElementById('modalBody');
+        const currencyCount = document.getElementById('currencyCount');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Converter
+        const converterAmount = document.getElementById('converterAmount');
+        const converterFrom = document.getElementById('converterFrom');
+        const converterTo = document.getElementById('converterTo');
+        const converterPriceType = document.getElementById('converterPriceType');
+        const converterMarket = document.getElementById('converterMarket');
+        const swapBtn = document.getElementById('swapCurrencies');
+        const convertedAmount = document.getElementById('convertedAmount');
+        const convertedDetail = document.getElementById('convertedDetail');
+
+        // =============================================
+        // 4. THEME
+        // =============================================
+        function getTheme() {
+            return localStorage.getItem('nova_theme') || 'light';
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('nova_theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // تطبيق الثيم عند التحميل
+        setTheme(getTheme());
+
+        themeToggle.addEventListener('click', () => {
+            const current = getTheme();
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // =============================================
+        // 5. TOAST
+        // =============================================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // =============================================
+        // 6. RENDER CURRENCIES
+        // =============================================
+        function getFilteredData() {
+            let data = [...currentCurrencyData];
+
+            // فلتر المفضلة
+            if (currentFilter === 'favorites') {
+                data = data.filter(c => favorites.includes(c.id));
+            }
+
+            // بحث
+            if (searchQuery.trim()) {
+                const q = searchQuery.trim().toLowerCase();
+                data = data.filter(c =>
+                    c.name.includes(q) ||
+                    c.code.toLowerCase().includes(q) ||
+                    c.country.includes(q)
+                );
+            }
+
+            return data;
+        }
+
+        function renderCurrencies() {
+            const data = getFilteredData();
+            currencyCount.textContent = data.length;
+
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-secondary);">
+                        <div style="font-size:48px; margin-bottom:12px;">🔍</div>
+                        <h3 style="margin-bottom:8px;">لا توجد نتائج</h3>
+                        <p>لم نجد أي عملة تطابق بحثك</p>
                     </div>
-                    <button class="btn-update" onclick="APP.refreshRates()">تحديث</button>
-                </div>
-                <section class="section-currencies">
-                    <h2 class="section-title">العملات الرئيسية</h2>
-                    <div id="currencyList" class="currency-list"></div>
-                </section>
-            </section>
+                `;
+                return;
+            }
 
-            <!-- ================= RATES PAGE ================= -->
-            <section id="page-rates" class="page-section">
-                <h2 class="section-title">جميع العملات</h2>
-                <div id="allCurrencyList" class="currency-list"></div>
-            </section>
+            grid.innerHTML = data.map(currency => {
+                const isFavorite = favorites.includes(currency.id);
+                const changeClass = currency.change >= 0 ? 'positive' : 'negative';
+                const changeIcon = currency.change >= 0 ? '↑' : '↓';
+                const market = 'official'; // افتراضي، سيتم التطوير لاحقاً
 
-            <!-- ================= CONVERTER PAGE ================= -->
-            <section id="page-converter" class="page-section">
-                <div class="converter-wrapper">
-                    <h2 class="section-title">محول العملات</h2>
-                    <div class="converter-box">
-                        <div class="conv-row">
-                            <label>من</label>
-                            <div class="conv-select-group">
-                                <select id="convFrom" class="conv-select"></select>
-                                <input type="number" id="convAmount" class="conv-input" value="1" min="0" placeholder="المبلغ">
-                            </div>
-                        </div>
-                        <button class="swap-btn" onclick="APP.swapConverter()">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6C4DFF" stroke-width="2"><path d="M7 10l5-5 5 5M17 14l-5 5-5-5"/></svg>
+                return `
+                    <div class="currency-card" data-id="${currency.id}">
+                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${currency.id}">
+                            ${isFavorite ? '⭐' : '☆'}
                         </button>
-                        <div class="conv-row">
-                            <label>إلى</label>
-                            <div class="conv-select-group">
-                                <select id="convTo" class="conv-select"></select>
-                                <div id="convResult" class="conv-result">---</div>
+                        <div class="top-row">
+                            <span class="flag">${currency.flag}</span>
+                            <div class="info">
+                                <div class="name">${currency.name}</div>
+                                <div class="code">${currency.code} · ${currency.country}</div>
                             </div>
                         </div>
-                        <div class="conv-rate-type">
-                            <label>نوع السعر:</label>
-                            <select id="convRateType" class="conv-select" onchange="APP.calculateConversion()">
-                                <option value="sell">سعر البيع</option>
-                                <option value="buy">سعر الشراء</option>
-                                <option value="mid">السعر المتوسط</option>
-                            </select>
+                        <div class="rates">
+                            <div class="rate-item">
+                                <div class="label">شراء</div>
+                                <div class="value">${currency[market]?.buy || '—'}</div>
+                            </div>
+                            <div class="rate-item">
+                                <div class="label">بيع</div>
+                                <div class="value">${currency[market]?.sell || '—'}</div>
+                            </div>
+                        </div>
+                        <div class="bottom-row">
+                            <span class="change ${changeClass}">
+                                ${changeIcon} ${Math.abs(currency.change)}%
+                            </span>
+                            <span class="updated-at">🕐 ${currency.updatedAt}</span>
                         </div>
                     </div>
+                `;
+            }).join('');
+
+            // Events للبطاقات
+            document.querySelectorAll('.currency-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.favorite-btn')) return;
+                    const id = card.dataset.id;
+                    const currency = currentCurrencyData.find(c => c.id === id);
+                    if (currency) openModal(currency);
+                });
+            });
+
+            // Events لأزرار المفضلة
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    toggleFavorite(id);
+                });
+            });
+        }
+
+        // =============================================
+        // 7. FAVORITES
+        // =============================================
+        function toggleFavorite(id) {
+            const index = favorites.indexOf(id);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                showToast('تمت إزالة العملة من المفضلة', 'info');
+            } else {
+                favorites.push(id);
+                showToast('تمت إضافة العملة إلى المفضلة ⭐', 'success');
+            }
+            localStorage.setItem('nova_favorites', JSON.stringify(favorites));
+            renderCurrencies();
+            renderConverterOptions();
+        }
+
+        // =============================================
+        // 8. SEARCH
+        // =============================================
+        searchInput.addEventListener('input', () => {
+            searchQuery = searchInput.value;
+            clearSearch.classList.toggle('visible', searchQuery.length > 0);
+            renderCurrencies();
+        });
+
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearch.classList.remove('visible');
+            renderCurrencies();
+        });
+
+        // =============================================
+        // 9. FILTERS
+        // =============================================
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderCurrencies();
+            });
+        });
+
+        // =============================================
+        // 10. MODAL
+        // =============================================
+        function openModal(currency) {
+            modalFlag.textContent = currency.flag;
+            modalName.textContent = `${currency.code} - ${currency.name}`;
+
+            modalBody.innerHTML = `
+                <div class="detail-row">
+                    <span class="label">🇨🇳 البلد</span>
+                    <span class="value">${currency.country}</span>
                 </div>
-            </section>
-
-            <!-- ================= FAVORITES PAGE ================= -->
-            <section id="page-favorites" class="page-section">
-                <h2 class="section-title">المفضلة</h2>
-                <div id="favList" class="currency-list"></div>
-            </section>
-
-            <!-- ================= CURRENCY DETAILS PAGE ================= -->
-            <section id="page-details" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('home')">← رجوع</button>
-                <div class="details-header">
-                    <div class="details-flag" id="detailFlag">🇺🇸</div>
-                    <div>
-                        <h2 id="detailName">الدولار الأمريكي</h2>
-                        <span id="detailCode" class="currency-code">USD</span>
+                <div class="detail-row">
+                    <span class="label">📈 التغير</span>
+                    <span class="value" style="color:${currency.change >= 0 ? 'var(--success)' : 'var(--error)'}">
+                        ${currency.change >= 0 ? '↑' : '↓'} ${Math.abs(currency.change)}%
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">🕐 آخر تحديث</span>
+                    <span class="value">${currency.updatedAt}</span>
+                </div>
+                <div style="margin-top:20px; padding-top:16px; border-top:2px solid var(--bg);">
+                    <h4 style="margin-bottom:12px;">🏦 السوق الرسمي</h4>
+                    <div class="detail-row">
+                        <span class="label">شراء</span>
+                        <span class="value">${currency.official.buy} SDG</span>
                     </div>
-                    <button class="fav-btn" id="detailFavBtn" onclick="APP.toggleDetailFav()">☆</button>
-                </div>
-                <div class="details-prices">
-                    <div class="dp-box"><span class="label">شراء</span><span class="val-buy" id="detailBuy">1,580</span></div>
-                    <div class="dp-box"><span class="label">بيع</span><span class="val-sell" id="detailSell">1,595</span></div>
-                    <div class="dp-box"><span class="label">متوسط</span><span id="detailMid">1,587</span></div>
-                </div>
-                <div class="details-chart">
-                    <div class="chart-timeframes">
-                        <button class="tf-btn active" onclick="APP.renderMockChart('24H')">24H</button>
-                        <button class="tf-btn" onclick="APP.renderMockChart('7D')">7D</button>
-                        <button class="tf-btn" onclick="APP.renderMockChart('30D')">30D</button>
-                        <button class="tf-btn" onclick="APP.renderMockChart('3M')">3M</button>
-                    </div>
-                    <canvas id="detailChart" width="300" height="150"></canvas>
-                    <div class="chart-stats">
-                        <span>أعلى: <b id="detailHigh">1,610</b></span>
-                        <span>أدنى: <b id="detailLow">1,570</b></span>
+                    <div class="detail-row">
+                        <span class="label">بيع</span>
+                        <span class="value">${currency.official.sell} SDG</span>
                     </div>
                 </div>
-                <div class="details-actions">
-                    <button class="btn-half" onclick="APP.navigate('create-alert')">🔔 تنبيه</button>
-                    <button class="btn-half" onclick="alert('تم نسخ الرابط للمشاركة!')">📤 مشاركة</button>
+                <div style="margin-top:16px; padding-top:16px; border-top:2px solid var(--bg);">
+                    <h4 style="margin-bottom:12px;">💱 السوق الموازي</h4>
+                    <div class="detail-row">
+                        <span class="label">شراء</span>
+                        <span class="value">${currency.parallel.buy} SDG</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">بيع</span>
+                        <span class="value">${currency.parallel.sell} SDG</span>
+                    </div>
                 </div>
-            </section>
-
-            <!-- ================= ALERTS LIST PAGE ================= -->
-            <section id="page-alerts" class="page-section">
-                <div class="section-header-flex">
-                    <h2 class="section-title">تنبيهات الأسعار</h2>
-                    <button class="btn-small" onclick="APP.navigate('create-alert')">+ إضافة</button>
+                <div style="margin-top:20px; padding-top:16px; border-top:2px solid var(--bg); text-align:center;">
+                    <button class="btn btn-primary" onclick="document.getElementById('converter').scrollIntoView({behavior:'smooth'})">
+                        🔄 تحويل العملة
+                    </button>
                 </div>
-                <div id="alertsList" class="alerts-list"></div>
-            </section>
+            `;
 
-            <!-- ================= CREATE ALERT PAGE ================= -->
-            <section id="page-create-alert" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('alerts')">← رجوع</button>
-                <h2 class="section-title">إنشاء تنبيه</h2>
-                <div class="form-group">
-                    <label>العملة</label>
-                    <select id="alertCurrency" class="conv-select">
-                        <option value="USD">USD - دولار أمريكي</option>
-                        <option value="EUR">EUR - يورو</option>
-                        <option value="SAR">SAR - ريال سعودي</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>نوع السعر</label>
-                    <select id="alertPriceType" class="conv-select"><option>سعر البيع</option><option>سعر الشراء</option></select>
-                </div>
-                <div class="form-group">
-                    <label>الشرط</label>
-                    <select id="alertCondition" class="conv-select"><option>أكبر من (>)</option><option>أقل من (<)</option><option>يساوي (=)</option></select>
-                </div>
-                <div class="form-group">
-                    <label>السعر المستهدف</label>
-                    <input type="number" id="alertTarget" class="conv-input" placeholder="مثال: 1600">
-                </div>
-                <button class="btn-full" onclick="APP.saveAlert()">حفظ التنبيه</button>
-            </section>
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
 
-            <!-- ================= NEWS PAGE ================= -->
-            <section id="page-news" class="page-section">
-                <h2 class="section-title">أخبار العملات</h2>
-                <div id="newsList" class="news-list"></div>
-            </section>
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
 
-            <!-- ================= NEWS DETAILS ================= -->
-            <section id="page-news-details" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('news')">← رجوع</button>
-                <div class="news-detail-header">
-                    <h2 id="newsDetailTitle">عنوان الخبر</h2>
-                    <span id="newsDetailDate">تاريخ الخبر</span>
-                </div>
-                <div id="newsDetailImage" style="width:100%; height:150px; background:#ddd; margin:10px 0; border-radius:12px;"></div>
-                <p id="newsDetailBody" class="news-detail-body">محتوى الخبر التفصيلي...</p>
-                <button class="btn-full" style="margin-top: 10px;" onclick="alert('تم النسخ للمشاركة!')">📤 مشاركة الخبر</button>
-            </section>
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
 
-            <!-- ================= SEARCH PAGE ================= -->
-            <section id="page-search" class="page-section">
-                <div class="search-input-wrapper">
-                    <input type="text" id="searchInput" placeholder="ابحث عن عملة..." oninput="APP.performSearch()" autofocus>
-                    <button class="btn-close-search" onclick="APP.navigate('home')">إلغاء</button>
-                </div>
-                <div id="searchResults" class="currency-list"></div>
-            </section>
+        // =============================================
+        // 11. CONVERTER
+        // =============================================
+        function renderConverterOptions() {
+            const options = currentCurrencyData.map(c =>
+                `<option value="${c.id}">${c.flag} ${c.code}</option>`
+            ).join('');
 
-            <!-- ================= NOTIFICATIONS ================= -->
-            <section id="page-notifications" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('more')">← رجوع</button>
-                <div class="section-header-flex">
-                    <h2 class="section-title">الإشعارات</h2>
-                    <button class="btn-small" onclick="APP.markAllRead()">قراءة الكل</button>
-                </div>
-                <div id="notifList" class="notif-list"></div>
-            </section>
+            converterFrom.innerHTML = options;
+            converterTo.innerHTML = options;
+            converterFrom.value = 'usd';
+            converterTo.value = 'sar';
+        }
 
-            <!-- ================= MORE PAGE ================= -->
-            <section id="page-more" class="page-section">
-                <h2 class="section-title">المزيد</h2>
-                <ul class="menu-list">
-                    <li onclick="APP.navigate('rates')"><span>جميع العملات</span></li>
-                    <li onclick="APP.navigate('converter')"><span>محول العملات</span></li>
-                    <li onclick="APP.navigate('favorites')"><span>المفضلة</span></li>
-                    <li onclick="APP.navigate('alerts')"><span>تنبيهات الأسعار</span></li>
-                    <li onclick="APP.navigate('charts')"><span>الرسوم البيانية</span></li>
-                    <li onclick="APP.navigate('news')"><span>الأخبار</span></li>
-                    <li onclick="APP.navigate('notifications')"><span>الإشعارات</span></li>
-                    <li class="divider"></li>
-                    <li onclick="APP.navigate('pro')"><span style="color: var(--nova-purple); font-weight: bold;">NOVA Pro</span></li>
-                    <li class="divider"></li>
-                    <li><span class="menu-cat">حسابي</span></li>
-                    <li onclick="APP.navigate('profile')"><span>الملف الشخصي</span></li>
-                    <li onclick="APP.navigate('settings')"><span>الإعدادات</span></li>
-                    <li class="divider"></li>
-                    <li><span class="menu-cat">المساعدة</span></li>
-                    <li onclick="APP.navigate('faq')"><span>الأسئلة الشائعة</span></li>
-                    <li onclick="APP.navigate('contact')"><span>تواصل معنا</span></li>
-                    <li class="divider"></li>
-                    <li><span class="menu-cat">عن NOVA</span></li>
-                    <li onclick="APP.navigate('about')"><span>عن التطبيق</span></li>
-                    <li onclick="APP.navigate('privacy')"><span>سياسة الخصوصية</span></li>
-                    <li onclick="APP.navigate('terms')"><span>الشروط والأحكام</span></li>
-                    <li style="font-size: 12px; color: #999; text-align: center; background: #F9FAFB;">الإصدار 1.0.0</li>
-                </ul>
-            </section>
+        function convertCurrency() {
+            const fromId = converterFrom.value;
+            const toId = converterTo.value;
+            const amount = parseFloat(converterAmount.value) || 0;
+            const priceType = converterPriceType.value;
+            const market = converterMarket.value;
 
-            <!-- ================= SETTINGS ================= -->
-            <section id="page-settings" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('more')">← رجوع</button>
-                <h2 class="section-title">الإعدادات</h2>
-                <div class="settings-group">
-                    <div class="settings-item"><span>اللغة</span><select><option>العربية</option><option>English</option></select></div>
-                    <div class="settings-item"><span>الوضع الداكن</span><select><option>نظام</option><option>فاتح</option><option>داكن</option></select></div>
-                    <div class="settings-item"><span>الإشعارات</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
-                    <div class="settings-item"><span>تحديث تلقائي</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
-                    <div class="settings-item"><span>مدة التحديث</span><select><option>كل 5 دقائق</option><option>كل 10 دقائق</option><option>كل ساعة</option></select></div>
-                </div>
-                <button class="btn-full" style="background: #EF4444; margin-top:20px;" onclick="if(confirm('هل أنت متأكد من مسح الكاش؟')) alert('تم مسح الكاش!')">مسح الكاش</button>
-                <button class="btn-full" style="background: #EF4444; margin-top:10px;" onclick="if(confirm('إعادة ضبط الإعدادات؟')) alert('تمت إعادة الضبط!')">إعادة ضبط الإعدادات</button>
-            </section>
+            const fromCurrency = currentCurrencyData.find(c => c.id === fromId);
+            const toCurrency = currentCurrencyData.find(c => c.id === toId);
 
-            <!-- ================= PROFILE ================= -->
-            <section id="page-profile" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('more')">← رجوع</button>
-                <h2 class="section-title">الملف الشخصي</h2>
-                <div class="profile-card">
-                    <div class="profile-avatar">👤</div>
-                    <h3>زائر</h3>
-                    <p style="color:#6C7A8C; font-size:13px;">قم بتسجيل الدخول لمزامنة بياناتك</p>
-                    <button class="btn-full" onclick="APP.navigate('login')">تسجيل الدخول</button>
-                    <button class="btn-full" style="background:#F4F7FA; color: var(--nova-blue); margin-top:10px;" onclick="APP.navigate('register')">إنشاء حساب</button>
-                </div>
-            </section>
+            if (!fromCurrency || !toCurrency) {
+                convertedAmount.textContent = '0.00';
+                convertedDetail.textContent = '⚠️ عملة غير متوفرة';
+                return;
+            }
 
-            <!-- ================= AUTH PAGES ================= -->
-            <section id="page-login" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('profile')">← رجوع</button>
-                <h2 class="section-title" style="text-align: center;">تسجيل الدخول</h2>
-                <div class="form-group"><input type="email" class="conv-input" placeholder="البريد الإلكتروني"></div>
-                <div class="form-group"><input type="password" class="conv-input" placeholder="كلمة المرور"></div>
-                <button class="btn-full" onclick="alert('تم تسجيل الدخول بنجاح (وهمي)'); APP.navigate('profile')">دخول</button>
-                <div class="auth-links"><span onclick="APP.navigate('register')">إنشاء حساب</span> | <span onclick="APP.navigate('forgot-password')">نسيت كلمة المرور؟</span></div>
-            </section>
-            <section id="page-register" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('login')">← رجوع</button>
-                <h2 class="section-title" style="text-align: center;">إنشاء حساب</h2>
-                <div class="form-group"><input type="text" class="conv-input" placeholder="الاسم الكامل"></div>
-                <div class="form-group"><input type="email" class="conv-input" placeholder="البريد الإلكتروني"></div>
-                <div class="form-group"><input type="password" class="conv-input" placeholder="كلمة المرور"></div>
-                <button class="btn-full" onclick="alert('تم إنشاء الحساب بنجاح!'); APP.navigate('login')">تسجيل</button>
-            </section>
-            <section id="page-forgot-password" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('login')">← رجوع</button>
-                <h2 class="section-title" style="text-align: center;">استعادة كلمة المرور</h2>
-                <div class="form-group"><input type="email" class="conv-input" placeholder="البريد الإلكتروني"></div>
-                <button class="btn-full" onclick="alert('تم إرسال رابط الاستعادة إلى بريدك الإلكتروني!')">إرسال رابط الاستعادة</button>
-            </section>
+            const fromRate = fromCurrency[market]?.[priceType] || 0;
+            const toRate = toCurrency[market]?.[priceType] || 0;
 
-            <!-- ================= NOVA PRO ================= -->
-            <section id="page-pro" class="page-section">
-                <button class="back-btn" onclick="APP.navigate('more')">← رجوع</button>
-                <div class="pro-hero">
-                    <div class="pro-badge">PRO</div>
-                    <h1 style="font-size: 32px; margin-bottom: 5px;">NOVA <span style="color: #FFD700;">Pro</span></h1>
-                    <p style="font-size:14px;">ارتقِ بتجربتك المالية</p>
-                </div>
-                <div class="pro-features">
-                    <div class="pf-item"><span>✔️</span> بدون إعلانات</div>
-                    <div class="pf-item"><span>✔️</span> تنبيهات غير محدودة</div>
-                    <div class="pf-item"><span>✔️</span> رسوم بيانية متقدمة</div>
-                    <div class="pf-item"><span>✔️</span> تاريخ أسعار أطول</div>
-                </div>
-                <button class="btn-full" style="background: var(--brand-gradient); font-weight:bold; font-size:18px;" onclick="alert('الدفع الحقيقي سيتم ربطه لاحقاً!')">ترقية إلى NOVA Pro</button>
-            </section>
+            if (fromRate === 0 || toRate === 0) {
+                convertedAmount.textContent = '0.00';
+                convertedDetail.textContent = '⚠️ السعر غير متوفر';
+                return;
+            }
 
-            <!-- ================= STATIC INFO PAGES ================= -->
-            <section id="page-about" class="page-section"><button class="back-btn" onclick="APP.navigate('more')">← رجوع</button><h2 class="section-title">عن NOVA</h2><p>NOVA شركة تقنية تعمل على تطوير منتجات رقمية سهلة ومفيدة للمستخدمين في السودان والعالم العربي. نؤمن بالشفافية والدقة في تقديم المعلومات المالية.</p></section>
-            <section id="page-contact" class="page-section"><button class="back-btn" onclick="APP.navigate('more')">← رجوع</button><h2 class="section-title">تواصل معنا</h2><div style="background:white; padding:20px; border-radius:12px;"><p>📧 البريد الإلكتروني: info@nova.sd</p><p>📞 واتساب: +249 123 456 789</p><p>🌐 الموقع: www.nova.sd</p></div></section>
-            <section id="page-faq" class="page-section"><button class="back-btn" onclick="APP.navigate('more')">← رجوع</button><h2 class="section-title">الأسئلة الشائعة</h2><div style="background:white; padding:20px; border-radius:12px;"><b>هل الأسعار دقيقة؟</b><p style="font-size:14px; color:#555;">الأسعار لأغراض معلوماتية فقط وقد تختلف عن الواقع الفعلي في السوق.</p><br><b>كيف يمكنني تحديث الأسعار؟</b><p style="font-size:14px; color:#555;">يمكنك الضغط على زر "تحديث" في الصفحة الرئيسية.</p></div></section>
-            <section id="page-privacy" class="page-section"><button class="back-btn" onclick="APP.navigate('more')">← رجوع</button><h2 class="section-title">سياسة الخصوصية</h2><p>نحن نحترم خصوصية بياناتك. لا نقوم بمشاركة بياناتك مع جهات خارجية بدون موافقتك الصريحة. جميع البيانات محفوظة بشكل آمن.</p></section>
-            <section id="page-terms" class="page-section"><button class="back-btn" onclick="APP.navigate('more')">← رجوع</button><h2 class="section-title">شروط الاستخدام</h2><p>استخدام التطبيق يعني موافقتك الكاملة على الشروط والأحكام. التطبيق متاح للاستخدام الشخصي فقط ولا يجوز إعادة بيعه أو نسخه.</p></section>
+            const result = (amount / fromRate) * toRate;
+            convertedAmount.textContent = result.toFixed(2);
+            convertedDetail.textContent = `${toCurrency.code} (${priceType === 'buy' ? 'شراء' : 'بيع'} - ${market === 'official' ? 'رسمي' : 'موازي'})`;
+        }
 
-        </main>
+        // Converter Events
+        converterAmount.addEventListener('input', convertCurrency);
+        converterFrom.addEventListener('change', convertCurrency);
+        converterTo.addEventListener('change', convertCurrency);
+        converterPriceType.addEventListener('change', convertCurrency);
+        converterMarket.addEventListener('change', convertCurrency);
 
-        <!-- BOTTOM NAVIGATION -->
-        <nav class="bottom-nav">
-            <button class="nav-item active" data-page="home" onclick="APP.navigate('home')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                <span>الرئيسية</span>
-            </button>
-            <button class="nav-item" data-page="rates" onclick="APP.navigate('rates')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                <span>الأسعار</span>
-            </button>
-            <button class="nav-item" data-page="converter" onclick="APP.navigate('converter')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 21h4a2 2 0 0 0 2-2v-5c0-1.1-.9-2-2-2h-4a2 2 0 0 0-2 2v5c0 1.1.9 2 2 2z"></path><path d="M12 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2z"></path><rect x="2" y="13" width="6" height="6" rx="2"></rect><rect x="16" y="3" width="6" height="6" rx="2"></rect></svg>
-                <span>المحول</span>
-            </button>
-            <button class="nav-item" data-page="favorites" onclick="APP.navigate('favorites')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                <span>المفضلة</span>
-            </button>
-            <button class="nav-item" data-page="more" onclick="APP.navigate('more')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                <span>المزيد</span>
-            </button>
-        </nav>
-    </div>
+        swapBtn.addEventListener('click', () => {
+            const temp = converterFrom.value;
+            converterFrom.value = converterTo.value;
+            converterTo.value = temp;
+            convertCurrency();
+            showToast('🔄 تم تبديل العملات', 'info');
+        });
 
-    <!-- المسار المعدل للـ JS (لأن index.html أصبح داخل public) -->
-    <script type="module" src="../src/js/app.js"></script>
+        // =============================================
+        // 12. MOBILE MENU
+        // =============================================
+        hamburger.addEventListener('click', () => {
+            mainNav.classList.toggle('open');
+            hamburger.textContent = mainNav.classList.contains('open') ? '✕' : '☰';
+        });
+
+        // Close menu on link click
+        mainNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mainNav.classList.remove('open');
+                hamburger.textContent = '☰';
+            });
+        });
+
+        // =============================================
+        // 13. INIT
+        // =============================================
+        renderConverterOptions();
+        renderCurrencies();
+        convertCurrency();
+
+        // تحديث المحول عند تغير البيانات
+        console.log('🚀 NOVA RATE جاهز!');
+        console.log(`📊 ${currentCurrencyData.length} عملة متاحة`);
+        console.log(`⭐ ${favorites.length} عملة في المفضلة`);
+
+        // Expose للـ Console للتطوير
+        window.__nova = {
+            currencies: currentCurrencyData,
+            favorites,
+            toggleFavorite,
+            renderCurrencies
+        };
+    </script>
 </body>
 </html>
