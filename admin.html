@@ -339,7 +339,7 @@
         }
 
         /* ============================================
-           CURRENCY TABLE
+           CURRENCY TABLE / GRID
         ============================================ */
         .table-container {
             background: var(--card-bg);
@@ -413,14 +413,47 @@
             color: var(--error);
         }
 
-        .price-cell {
-            font-size: 13px;
+        /* ============================================
+           ADS SETTINGS - TOGGLE SWITCH
+        ============================================ */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
         }
-        .price-cell .official {
-            color: var(--primary);
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
-        .price-cell .parallel {
-            color: var(--secondary);
+        .switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            transition: var(--transition);
+            border-radius: 34px;
+        }
+        .switch .slider::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+        .switch input:checked + .slider {
+            background: var(--primary);
+        }
+        .switch input:checked + .slider::before {
+            transform: translateX(22px);
         }
 
         /* ============================================
@@ -443,7 +476,7 @@
         .modal {
             background: var(--card-bg);
             border-radius: var(--radius);
-            max-width: 640px;
+            max-width: 560px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -547,39 +580,6 @@
         .modal-body .form-actions .btn-secondary:hover {
             background: var(--error);
             color: white;
-        }
-
-        /* Price sections in form */
-        .price-section {
-            background: var(--bg);
-            padding: 16px;
-            border-radius: 12px;
-            margin: 16px 0;
-        }
-        .price-section h4 {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .price-section .official-color {
-            color: var(--primary);
-        }
-        .price-section .parallel-color {
-            color: var(--secondary);
-        }
-        .price-section .price-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        .price-section .form-group {
-            margin-bottom: 0;
-        }
-        .price-section .form-group label {
-            font-size: 13px;
         }
 
         /* ============================================
@@ -776,12 +776,6 @@
             .toast {
                 min-width: unset;
             }
-            .price-section .price-grid {
-                grid-template-columns: 1fr;
-            }
-            .modal-body .form-group {
-                grid-column: span 2 !important;
-            }
         }
     </style>
 </head>
@@ -826,6 +820,7 @@
             <a href="#" data-page="activity"><span class="icon">📜</span> سجل النشاطات</a>
             <a href="#" data-page="users"><span class="icon">👥</span> المستخدمين</a>
             <a href="#" data-page="settings"><span class="icon">⚙️</span> الإعدادات</a>
+            <a href="#" data-page="ads"><span class="icon">📢</span> الإعلانات</a>
         </nav>
         <div class="sidebar-footer">
             <button id="logoutBtn">🚪 تسجيل الخروج</button>
@@ -878,9 +873,8 @@
                     ➕ إضافة عملة
                 </button>
             </div>
-            <p class="subtitle">إضافة، تعديل، وحذف العملات مع السعر الرسمي والسوق الأسود</p>
+            <p class="subtitle">إضافة، تعديل، وحذف العملات والأسعار</p>
 
-            <!-- Search & Filter -->
             <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
                 <input type="text" id="searchCurrency" placeholder="🔍 ابحث عن عملة..." style="flex: 1; min-width: 200px; padding: 12px 16px; border: 2px solid var(--bg); border-radius: 12px; background: var(--card-bg); color: var(--text); outline: none; transition: var(--transition);">
                 <select id="sortCurrency" style="padding: 12px 16px; border: 2px solid var(--bg); border-radius: 12px; background: var(--card-bg); color: var(--text); outline: none;">
@@ -897,15 +891,14 @@
                         <tr>
                             <th>العملة</th>
                             <th>الرمز</th>
-                            <th>السعر (رسمي / موازي)</th>
+                            <th>سعر الشراء</th>
+                            <th>سعر البيع</th>
                             <th>الحالة</th>
                             <th>آخر تحديث</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="currencyTableBody">
-                        <!-- سيتم ملؤها بواسطة JS -->
-                    </tbody>
+                    <tbody id="currencyTableBody"></tbody>
                 </table>
                 <div id="currencyEmpty" class="empty-state"><div class="icon">📭</div><h3>لا توجد عملات</h3><p>ابدأ بإضافة أول عملة</p></div>
             </div>
@@ -953,10 +946,133 @@
             </div>
         </section>
 
+        <!-- ==================== ADS SETTINGS ==================== -->
+        <section id="page-ads" class="page-section">
+            <h2>📢 إعدادات الإعلانات</h2>
+            <p class="subtitle">التحكم في نظام الإعلانات وإعداداته</p>
+
+            <div class="stats-grid" id="adsStatsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-number" id="adsImpressions">0</div>
+                    <div class="stat-label">مرات الظهور</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📥</div>
+                    <div class="stat-number" id="adsRequests">0</div>
+                    <div class="stat-label">طلبات الإعلانات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-number" id="adsFailures">0</div>
+                    <div class="stat-label">فشل التحميل</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-number" id="adsRevenue">N/A</div>
+                    <div class="stat-label">العائد التقديري</div>
+                </div>
+            </div>
+
+            <div class="table-container" style="padding: 24px;">
+                <h3 style="margin-bottom: 20px;">⚙️ إعدادات الإعلانات</h3>
+                <form id="adsSettingsForm" style="display: grid; gap: 16px; max-width: 500px;">
+
+                    <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="margin-bottom: 0; font-weight: 600;">🔘 تفعيل الإعلانات</label>
+                        <label class="switch">
+                            <input type="checkbox" id="adsEnabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="margin-bottom: 0;">📱 Banner Ads</label>
+                        <label class="switch">
+                            <input type="checkbox" id="bannerEnabled" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="margin-bottom: 0;">🔄 Interstitial Ads</label>
+                        <label class="switch">
+                            <input type="checkbox" id="interstitialEnabled" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="margin-bottom: 0;">🎁 Rewarded Ads</label>
+                        <label class="switch">
+                            <input type="checkbox" id="rewardedEnabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <label>⏱️ Cooldown (ثواني)</label>
+                        <input type="number" id="adsCooldown" value="60" min="10" max="300">
+                    </div>
+
+                    <div class="form-group">
+                        <label>📅 الحد اليومي</label>
+                        <input type="number" id="adsDailyLimit" value="5" min="1" max="20">
+                    </div>
+
+                    <div class="form-group">
+                        <label>📊 حد الجلسة</label>
+                        <input type="number" id="adsSessionLimit" value="3" min="1" max="10">
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <label>📍 أماكن الإعلانات</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                                <input type="checkbox" id="placementHome" checked> الرئيسية
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                                <input type="checkbox" id="placementRates" checked> الأسعار
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                                <input type="checkbox" id="placementConverter"> المحول
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                                <input type="checkbox" id="placementDetails" checked> تفاصيل العملة
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 حفظ الإعدادات</button>
+                        <button type="button" class="btn btn-secondary" id="resetAdsBtn">↩️ إعادة تعيين</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-container" style="padding: 24px; margin-top: 16px;">
+                <h3 style="margin-bottom: 16px;">🧪 Test Mode</h3>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="testBannerBtn">📱 اختبار Banner</button>
+                    <button class="btn btn-secondary" id="testInterstitialBtn">🔄 اختبار Interstitial</button>
+                    <button class="btn" id="testRewardedBtn" style="background: var(--success); color: white;">🎁 اختبار Rewarded</button>
+                </div>
+                <div id="testResult" style="margin-top: 12px; font-size: 14px; color: var(--text-secondary);"></div>
+            </div>
+        </section>
+
     </div> <!-- end main-content -->
 
     <!-- ============================================
-    MODAL - Add/Edit Currency (مع السعر الرسمي والسوق الأسود)
+    MODAL - Add/Edit Currency
     ============================================ -->
     <div class="modal-overlay" id="currencyModal">
         <div class="modal">
@@ -967,62 +1083,34 @@
             <div class="modal-body">
                 <form id="currencyForm">
                     <input type="hidden" id="formCurrencyId">
-
-                    <!-- معلومات العملة الأساسية -->
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
-                        <div class="form-group">
-                            <label>اسم العملة (عربي)</label>
-                            <input type="text" id="formNameAr" placeholder="مثال: الدولار الأمريكي" required>
-                        </div>
-                        <div class="form-group">
-                            <label>اسم العملة (إنجليزي)</label>
-                            <input type="text" id="formName" placeholder="مثال: US Dollar">
-                        </div>
-                        <div class="form-group">
-                            <label>الرمز</label>
-                            <input type="text" id="formCode" placeholder="مثال: USD" maxlength="3" style="text-transform: uppercase;" required>
-                        </div>
-                        <div class="form-group">
-                            <label>العلم (Emoji)</label>
-                            <input type="text" id="formFlag" placeholder="مثال: 🇺🇸" required>
-                        </div>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>الدولة</label>
-                            <input type="text" id="formCountry" placeholder="مثال: الولايات المتحدة">
-                        </div>
+                    <div class="form-group">
+                        <label>اسم العملة (عربي)</label>
+                        <input type="text" id="formNameAr" placeholder="مثال: الدولار الأمريكي" required>
                     </div>
-
-                    <!-- السعر الرسمي (البنوك) -->
-                    <div class="price-section">
-                        <h4 class="official-color">🏦 السعر الرسمي (البنوك)</h4>
-                        <div class="price-grid">
-                            <div class="form-group">
-                                <label>سعر الشراء (رسمي)</label>
-                                <input type="number" id="formOfficialBuy" placeholder="مثال: 1680" step="any" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label>سعر البيع (رسمي)</label>
-                                <input type="number" id="formOfficialSell" placeholder="مثال: 1700" step="any" min="0">
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>اسم العملة (إنجليزي)</label>
+                        <input type="text" id="formName" placeholder="مثال: US Dollar">
                     </div>
-
-                    <!-- السوق الأسود (الموازي) -->
-                    <div class="price-section">
-                        <h4 class="parallel-color">💱 السوق الأسود (الموازي)</h4>
-                        <div class="price-grid">
-                            <div class="form-group">
-                                <label>سعر الشراء (موازي)</label>
-                                <input type="number" id="formParallelBuy" placeholder="مثال: 1850" step="any" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label>سعر البيع (موازي)</label>
-                                <input type="number" id="formParallelSell" placeholder="مثال: 1880" step="any" min="0">
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>الرمز</label>
+                        <input type="text" id="formCode" placeholder="مثال: USD" maxlength="3" style="text-transform: uppercase;" required>
                     </div>
-
-                    <!-- الحالة -->
+                    <div class="form-group">
+                        <label>العلم (Emoji)</label>
+                        <input type="text" id="formFlag" placeholder="مثال: 🇺🇸" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الدولة</label>
+                        <input type="text" id="formCountry" placeholder="مثال: الولايات المتحدة">
+                    </div>
+                    <div class="form-group">
+                        <label>سعر الشراء</label>
+                        <input type="number" id="formBuy" placeholder="مثال: 1680" step="any" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>سعر البيع</label>
+                        <input type="number" id="formSell" placeholder="مثال: 1700" step="any" min="0">
+                    </div>
                     <div class="form-group">
                         <label>الحالة</label>
                         <select id="formStatus">
@@ -1030,7 +1118,6 @@
                             <option value="inactive">🔴 Inactive</option>
                         </select>
                     </div>
-
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" id="formCancelBtn">إلغاء</button>
                         <button type="submit" class="btn btn-primary" id="formSubmitBtn">💾 حفظ</button>
@@ -1093,10 +1180,10 @@
             orderBy,
             limit,
             serverTimestamp,
-            onSnapshot
+            onSnapshot,
+            where
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAmiuvUSKY-UPL_oD7FOgQUOUh1-lRUANo",
             authDomain: "nova-currency-app.firebaseapp.com",
@@ -1107,7 +1194,6 @@
             measurementId: "G-SR7RJTVKDN"
         };
 
-        // Initialize
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -1118,7 +1204,6 @@
         // ============================================
         const ADMIN_EMAIL = "mhmdfthu98@gmail.com";
 
-        // DOM Refs
         const loadingScreen = document.getElementById('loadingScreen');
         const loginScreen = document.getElementById('loginScreen');
         const loginError = document.getElementById('loginError');
@@ -1136,7 +1221,8 @@
             currencies: document.getElementById('page-currencies'),
             activity: document.getElementById('page-activity'),
             users: document.getElementById('page-users'),
-            settings: document.getElementById('page-settings')
+            settings: document.getElementById('page-settings'),
+            ads: document.getElementById('page-ads')
         };
 
         const statCurrencies = document.getElementById('statCurrencies');
@@ -1172,10 +1258,8 @@
         const formCode = document.getElementById('formCode');
         const formFlag = document.getElementById('formFlag');
         const formCountry = document.getElementById('formCountry');
-        const formOfficialBuy = document.getElementById('formOfficialBuy');
-        const formOfficialSell = document.getElementById('formOfficialSell');
-        const formParallelBuy = document.getElementById('formParallelBuy');
-        const formParallelSell = document.getElementById('formParallelSell');
+        const formBuy = document.getElementById('formBuy');
+        const formSell = document.getElementById('formSell');
         const formStatus = document.getElementById('formStatus');
         const formCancelBtn = document.getElementById('formCancelBtn');
         const formSubmitBtn = document.getElementById('formSubmitBtn');
@@ -1209,7 +1293,7 @@
         });
 
         // ============================================
-        // 4. TOAST NOTIFICATIONS
+        // 4. TOAST
         // ============================================
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -1242,6 +1326,7 @@
                 if (page === 'activity') loadActivityLog();
                 if (page === 'users') loadUsers();
                 if (page === 'dashboard') loadDashboardData();
+                if (page === 'ads') loadAdsSettings();
             });
         });
 
@@ -1274,17 +1359,13 @@
                     loginError.textContent = '❌ ليس لديك صلاحية للوصول إلى لوحة الإدارة.';
                     await signOut(auth);
                     googleLoginBtn.disabled = false;
-                    googleLoginBtn.innerHTML =
-                        `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 000 24c0 3.77.87 7.35 2.56 10.56l7.97-6.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                        تسجيل الدخول باستخدام Google`;
+                    googleLoginBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 000 24c0 3.77.87 7.35 2.56 10.56l7.97-6.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> تسجيل الدخول باستخدام Google`;
                 }
             } catch (error) {
                 console.error('Login error:', error);
                 loginError.textContent = `❌ ${error.message}`;
                 googleLoginBtn.disabled = false;
-                googleLoginBtn.innerHTML =
-                    `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 000 24c0 3.77.87 7.35 2.56 10.56l7.97-6.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                    تسجيل الدخول باستخدام Google`;
+                googleLoginBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 000 24c0 3.77.87 7.35 2.56 10.56l7.97-6.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> تسجيل الدخول باستخدام Google`;
             }
         }
 
@@ -1310,16 +1391,14 @@
             loginScreen.classList.add('active');
             loadingScreen.classList.add('hidden');
             googleLoginBtn.disabled = false;
-            googleLoginBtn.innerHTML =
-                `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 000 24c0 3.77.87 7.35 2.56 10.56l7.97-6.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                تسجيل الدخول باستخدام Google`;
+            googleLoginBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 000 24c0 3.77.87 7.35 2.56 10.56l7.97-6.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> تسجيل الدخول باستخدام Google`;
             loginError.textContent = '';
             if (window.unsubscribeCurrencies) window.unsubscribeCurrencies();
             if (window.unsubscribeActivities) window.unsubscribeActivities();
         }
 
         // ============================================
-        // 7. AUTH STATE OBSERVER
+        // 7. AUTH STATE
         // ============================================
         onAuthStateChanged(auth, async (user) => {
             loadingScreen.classList.add('hidden');
@@ -1346,7 +1425,7 @@
         });
 
         // ============================================
-        // 8. DASHBOARD DATA
+        // 8. DASHBOARD
         // ============================================
         async function loadDashboardData() {
             try {
@@ -1387,7 +1466,7 @@
                 const snapshot = await getDocs(q);
                 if (snapshot.empty) {
                     container.innerHTML =
-                    `<div class="empty-state"><div class="icon">📭</div><h3>لا توجد نشاطات حتى الآن</h3></div>`;
+                        `<div class="empty-state"><div class="icon">📭</div><h3>لا توجد نشاطات حتى الآن</h3></div>`;
                     return;
                 }
                 let html = `<table><thead><tr><th>الإجراء</th><th>العملة</th><th>التاريخ</th></tr></thead><tbody>`;
@@ -1407,12 +1486,12 @@
             } catch (error) {
                 console.error('Error loading recent activities:', error);
                 container.innerHTML =
-                `<div class="empty-state"><div class="icon">⚠️</div><h3>حدث خطأ في تحميل النشاطات</h3></div>`;
+                    `<div class="empty-state"><div class="icon">⚠️</div><h3>حدث خطأ في تحميل النشاطات</h3></div>`;
             }
         }
 
         // ============================================
-        // 9. CURRENCIES CRUD (مع السعر الرسمي والسوق الأسود)
+        // 9. CURRENCIES
         // ============================================
         let currenciesCache = [];
 
@@ -1468,10 +1547,8 @@
                     <tr>
                         <td><strong>${c.flag || ''} ${c.nameAr || c.name || ''}</strong></td>
                         <td><strong>${c.code || ''}</strong></td>
-                        <td class="price-cell">
-                            <div class="official">🏦 رسمي: ${c.officialBuy || 0} / ${c.officialSell || 0}</div>
-                            <div class="parallel">💱 موازي: ${c.parallelBuy || 0} / ${c.parallelSell || 0}</div>
-                        </td>
+                        <td>${c.buy || 0}</td>
+                        <td>${c.sell || 0}</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                         <td>${updatedAt}</td>
                         <td>
@@ -1495,7 +1572,6 @@
         searchCurrency.addEventListener('input', () => renderCurrencies(currenciesCache));
         sortCurrency.addEventListener('change', () => renderCurrencies(currenciesCache));
 
-        // Add Currency
         addCurrencyBtn.addEventListener('click', () => {
             currencyModalTitle.textContent = '➕ إضافة عملة جديدة';
             formCurrencyId.value = '';
@@ -1504,10 +1580,8 @@
             formCode.value = '';
             formFlag.value = '';
             formCountry.value = '';
-            formOfficialBuy.value = '';
-            formOfficialSell.value = '';
-            formParallelBuy.value = '';
-            formParallelSell.value = '';
+            formBuy.value = '';
+            formSell.value = '';
             formStatus.value = 'active';
             formSubmitBtn.textContent = '💾 حفظ';
             currencyModal.classList.add('active');
@@ -1523,16 +1597,13 @@
             formCode.value = currency.code || '';
             formFlag.value = currency.flag || '';
             formCountry.value = currency.country || '';
-            formOfficialBuy.value = currency.officialBuy || '';
-            formOfficialSell.value = currency.officialSell || '';
-            formParallelBuy.value = currency.parallelBuy || '';
-            formParallelSell.value = currency.parallelSell || '';
+            formBuy.value = currency.buy || '';
+            formSell.value = currency.sell || '';
             formStatus.value = currency.status || 'active';
             formSubmitBtn.textContent = '💾 تحديث';
             currencyModal.classList.add('active');
         }
 
-        // Form Submit
         document.getElementById('currencyForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = formCurrencyId.value;
@@ -1542,10 +1613,8 @@
                 code: formCode.value.trim().toUpperCase(),
                 flag: formFlag.value.trim(),
                 country: formCountry.value.trim(),
-                officialBuy: parseFloat(formOfficialBuy.value) || 0,
-                officialSell: parseFloat(formOfficialSell.value) || 0,
-                parallelBuy: parseFloat(formParallelBuy.value) || 0,
-                parallelSell: parseFloat(formParallelSell.value) || 0,
+                buy: parseFloat(formBuy.value) || 0,
+                sell: parseFloat(formSell.value) || 0,
                 status: formStatus.value,
                 updatedAt: serverTimestamp()
             };
@@ -1554,21 +1623,16 @@
                 formSubmitBtn.disabled = true;
                 formSubmitBtn.textContent = '⏳ جاري الحفظ...';
 
-                const priceDesc =
-                    `رسمي: ${data.officialBuy}/${data.officialSell} - موازي: ${data.parallelBuy}/${data.parallelSell}`;
-
                 if (id) {
                     await updateDoc(doc(db, 'currencies', id), data);
-                    await addActivityLog('UPDATE_CURRENCY', data.code || id,
-                        `تحديث عملة ${data.nameAr || data.code} - ${priceDesc}`);
+                    await addActivityLog('UPDATE_CURRENCY', data.code || id, `تحديث عملة ${data.nameAr || data.code}`);
                     showToast(`✅ تم تحديث العملة ${data.code} بنجاح`, 'success');
                 } else {
                     const docRef = await addDoc(collection(db, 'currencies'), {
                         ...data,
                         createdAt: serverTimestamp()
                     });
-                    await addActivityLog('ADD_CURRENCY', data.code || docRef.id,
-                        `إضافة عملة ${data.nameAr || data.code} - ${priceDesc}`);
+                    await addActivityLog('ADD_CURRENCY', data.code || docRef.id, `إضافة عملة ${data.nameAr || data.code}`);
                     showToast(`✅ تم إضافة العملة ${data.code} بنجاح`, 'success');
                 }
 
@@ -1593,7 +1657,6 @@
             if (e.target === currencyModal) closeCurrencyModal();
         });
 
-        // Delete Confirmation
         let deleteTargetId = null;
 
         function openDeleteConfirm(id) {
@@ -1745,7 +1808,124 @@
         });
 
         // ============================================
-        // 13. REALTIME LISTENERS
+        // 13. ADS SETTINGS
+        // ============================================
+        async function loadAdsSettings() {
+            try {
+                const docRef = doc(db, 'settings', 'ads');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('adsEnabled').checked = data.enabled || false;
+                    document.getElementById('bannerEnabled').checked = data.bannerEnabled !== false;
+                    document.getElementById('interstitialEnabled').checked = data.interstitialEnabled !== false;
+                    document.getElementById('rewardedEnabled').checked = data.rewardedEnabled || false;
+                    document.getElementById('adsCooldown').value = data.cooldownSeconds || 60;
+                    document.getElementById('adsDailyLimit').value = data.dailyLimit || 5;
+                    document.getElementById('adsSessionLimit').value = data.sessionLimit || 3;
+
+                    if (data.placements) {
+                        document.getElementById('placementHome').checked = data.placements.home !== false;
+                        document.getElementById('placementRates').checked = data.placements.rates !== false;
+                        document.getElementById('placementConverter').checked = data.placements.converter || false;
+                        document.getElementById('placementDetails').checked = data.placements.currencyDetails !== false;
+                    }
+                }
+
+                // تحميل تحليلات الإعلانات
+                await loadAdsAnalytics();
+            } catch (error) {
+                console.error('❌ Error loading ads settings:', error);
+            }
+        }
+
+        async function loadAdsAnalytics() {
+            try {
+                const impressionsSnap = await getDocs(collection(db, 'ads_impressions'));
+                const requestsSnap = await getDocs(collection(db, 'ads_requests'));
+                const failuresSnap = await getDocs(collection(db, 'ads_failures'));
+
+                document.getElementById('adsImpressions').textContent = impressionsSnap.size || 0;
+                document.getElementById('adsRequests').textContent = requestsSnap.size || 0;
+                document.getElementById('adsFailures').textContent = failuresSnap.size || 0;
+
+                // Revenue - سيتم تحديثه عند ربط AdMob
+                document.getElementById('adsRevenue').textContent = 'N/A';
+            } catch (error) {
+                console.error('❌ Error loading ads analytics:', error);
+            }
+        }
+
+        // حفظ إعدادات الإعلانات
+        async function saveAdsSettings(e) {
+            e.preventDefault();
+
+            const settings = {
+                enabled: document.getElementById('adsEnabled').checked,
+                bannerEnabled: document.getElementById('bannerEnabled').checked,
+                interstitialEnabled: document.getElementById('interstitialEnabled').checked,
+                rewardedEnabled: document.getElementById('rewardedEnabled').checked,
+                cooldownSeconds: parseInt(document.getElementById('adsCooldown').value) || 60,
+                dailyLimit: parseInt(document.getElementById('adsDailyLimit').value) || 5,
+                sessionLimit: parseInt(document.getElementById('adsSessionLimit').value) || 3,
+                placements: {
+                    home: document.getElementById('placementHome').checked,
+                    rates: document.getElementById('placementRates').checked,
+                    converter: document.getElementById('placementConverter').checked,
+                    currencyDetails: document.getElementById('placementDetails').checked
+                },
+                updatedAt: serverTimestamp(),
+                updatedBy: ADMIN_EMAIL
+            };
+
+            try {
+                await setDoc(doc(db, 'settings', 'ads'), settings);
+                await addActivityLog('UPDATE_ADS_SETTINGS', 'ads', 'تم تحديث إعدادات الإعلانات');
+                showToast('✅ تم حفظ إعدادات الإعلانات بنجاح', 'success');
+            } catch (error) {
+                console.error('❌ Error saving ads settings:', error);
+                showToast('❌ حدث خطأ أثناء حفظ الإعدادات', 'error');
+            }
+        }
+
+        // إعادة تعيين إعدادات الإعلانات
+        function resetAdsSettings() {
+            if (confirm('هل أنت متأكد من إعادة تعيين إعدادات الإعلانات إلى القيم الافتراضية؟')) {
+                document.getElementById('adsEnabled').checked = false;
+                document.getElementById('bannerEnabled').checked = true;
+                document.getElementById('interstitialEnabled').checked = true;
+                document.getElementById('rewardedEnabled').checked = false;
+                document.getElementById('adsCooldown').value = 60;
+                document.getElementById('adsDailyLimit').value = 5;
+                document.getElementById('adsSessionLimit').value = 3;
+                document.getElementById('placementHome').checked = true;
+                document.getElementById('placementRates').checked = true;
+                document.getElementById('placementConverter').checked = false;
+                document.getElementById('placementDetails').checked = true;
+                showToast('🔄 تم إعادة تعيين الإعدادات', 'info');
+            }
+        }
+
+        // اختبار الإعلانات
+        function testAd(type) {
+            const resultEl = document.getElementById('testResult');
+            resultEl.textContent = `⏳ جاري اختبار ${type}...`;
+            resultEl.style.color = 'var(--info)';
+
+            setTimeout(() => {
+                if (Math.random() > 0.2) {
+                    resultEl.textContent = `✅ تم عرض ${type} بنجاح (Test Mode)`;
+                    resultEl.style.color = 'var(--success)';
+                } else {
+                    resultEl.textContent = `❌ فشل عرض ${type} (Test Mode)`;
+                    resultEl.style.color = 'var(--error)';
+                }
+            }, 2000);
+        }
+
+        // ============================================
+        // 14. REALTIME LISTENERS
         // ============================================
         function startRealtimeListeners() {
             if (window.unsubscribeCurrencies) window.unsubscribeCurrencies();
@@ -1786,7 +1966,16 @@
         }
 
         // ============================================
-        // 14. INIT
+        // 15. EVENTS
+        // ============================================
+        document.getElementById('adsSettingsForm').addEventListener('submit', saveAdsSettings);
+        document.getElementById('resetAdsBtn').addEventListener('click', resetAdsSettings);
+        document.getElementById('testBannerBtn').addEventListener('click', () => testAd('Banner'));
+        document.getElementById('testInterstitialBtn').addEventListener('click', () => testAd('Interstitial'));
+        document.getElementById('testRewardedBtn').addEventListener('click', () => testAd('Rewarded'));
+
+        // ============================================
+        // 16. INIT
         // ============================================
         console.log('🚀 NOVA Currency Admin Panel جاهز!');
         console.log(`👤 المدير: ${ADMIN_EMAIL}`);
@@ -1799,9 +1988,10 @@
             loadActivityLog,
             loadUsers,
             loadSettings,
+            loadAdsSettings,
             addActivityLog,
             showToast
         };
     </script>
 </body>
-                </html>
+    </html>
