@@ -1037,7 +1037,7 @@
     JAVASCRIPT
     ============================ -->
              
-              <script type="module">
+        <script type="module">
 // =============================================
 // IMPORTS
 // =============================================
@@ -1070,21 +1070,18 @@ import {
 } from './firebase.js';
 
 // =============================================
-// 1. DATA - سيتم تحميلها من Firestore
+// 1. STATE
 // =============================================
 let currenciesData = [];
 let currentUser = null;
 let isAdmin = false;
-
-// =============================================
-// 2. STATE
-// =============================================
 let favorites = JSON.parse(localStorage.getItem('nova_favorites') || '[]');
 let currentFilter = 'all';
 let searchQuery = '';
+let unsubscribeCurrencies = null;
 
 // =============================================
-// 3. DOM REFS
+// 2. DOM REFS
 // =============================================
 const grid = document.getElementById('currenciesGrid');
 const searchInput = document.getElementById('searchInput');
@@ -1112,7 +1109,7 @@ const convertedAmount = document.getElementById('convertedAmount');
 const convertedDetail = document.getElementById('convertedDetail');
 
 // =============================================
-// 4. TOAST
+// 3. TOAST
 // =============================================
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
@@ -1127,7 +1124,7 @@ function showToast(message, type = 'info') {
 }
 
 // =============================================
-// 5. THEME
+// 4. THEME
 // =============================================
 function getTheme() {
     return localStorage.getItem('nova_theme') || 'light';
@@ -1147,7 +1144,7 @@ themeToggle.addEventListener('click', () => {
 });
 
 // =============================================
-// 6. AUTH MESSAGE
+// 5. AUTH MESSAGE
 // =============================================
 function getAuthErrorMessage(code) {
     const messages = {
@@ -1166,7 +1163,7 @@ function getAuthErrorMessage(code) {
 }
 
 // =============================================
-// 7. SAVE USER TO FIRESTORE
+// 6. SAVE USER TO FIRESTORE
 // =============================================
 async function saveUserToFirestore(user) {
     try {
@@ -1197,7 +1194,7 @@ async function saveUserToFirestore(user) {
 }
 
 // =============================================
-// 8. GOOGLE LOGIN
+// 7. GOOGLE LOGIN
 // =============================================
 async function handleGoogleLogin() {
     const message = document.getElementById('authMessage');
@@ -1262,7 +1259,7 @@ async function handleGoogleLogin() {
 }
 
 // =============================================
-// 9. HANDLE REDIRECT RESULT
+// 8. HANDLE REDIRECT RESULT
 // =============================================
 async function handleRedirectResult() {
     try {
@@ -1284,7 +1281,7 @@ async function handleRedirectResult() {
 }
 
 // =============================================
-// 10. AUTH UI UPDATE
+// 9. AUTH UI UPDATE
 // =============================================
 function updateAuthUI(user) {
     currentUser = user;
@@ -1328,7 +1325,7 @@ async function checkAdminStatus(uid) {
 }
 
 // =============================================
-// 11. AUTH MODAL
+// 10. AUTH MODAL
 // =============================================
 function createAuthModal() {
     const modalHTML = `
@@ -1576,7 +1573,7 @@ function createAuthModal() {
 }
 
 // =============================================
-// 12. LOAD CURRENCIES FROM FIRESTORE
+// 11. LOAD CURRENCIES FROM FIRESTORE
 // =============================================
 async function loadCurrenciesFromFirestore() {
     try {
@@ -1603,13 +1600,15 @@ async function loadCurrenciesFromFirestore() {
                 name: data.nameAr || data.name || doc.id,
                 flag: data.flag || '🏳️',
                 country: data.country || '',
+                // السعر الرسمي من الحقول المباشرة
                 official: { 
-                    buy: data.buy || 0, 
-                    sell: data.sell || 0 
+                    buy: data.officialBuy || 0, 
+                    sell: data.officialSell || 0 
                 },
+                // السوق الموازي من الحقول المباشرة
                 parallel: { 
-                    buy: data.buy || 0, 
-                    sell: data.sell || 0 
+                    buy: data.parallelBuy || 0, 
+                    sell: data.parallelSell || 0 
                 },
                 change: data.changePercent || 0,
                 updatedAt: data.updatedAt ? 
@@ -1638,10 +1637,8 @@ async function loadCurrenciesFromFirestore() {
 }
 
 // =============================================
-// 13. REALTIME LISTENER
+// 12. REALTIME LISTENER
 // =============================================
-let unsubscribeCurrencies = null;
-
 function setupRealtimeListener() {
     if (unsubscribeCurrencies) {
         unsubscribeCurrencies();
@@ -1659,8 +1656,14 @@ function setupRealtimeListener() {
                     name: data.nameAr || data.name || doc.id,
                     flag: data.flag || '🏳️',
                     country: data.country || '',
-                    official: { buy: data.buy || 0, sell: data.sell || 0 },
-                    parallel: { buy: data.buy || 0, sell: data.sell || 0 },
+                    official: { 
+                        buy: data.officialBuy || 0, 
+                        sell: data.officialSell || 0 
+                    },
+                    parallel: { 
+                        buy: data.parallelBuy || 0, 
+                        sell: data.parallelSell || 0 
+                    },
                     change: data.changePercent || 0,
                     updatedAt: data.updatedAt ? 
                         new Date(data.updatedAt.toDate()).toLocaleString('ar') : 
@@ -1680,7 +1683,7 @@ function setupRealtimeListener() {
 }
 
 // =============================================
-// 14. RENDER CURRENCIES
+// 13. RENDER CURRENCIES
 // =============================================
 function updateCurrencyCount() {
     const activeCurrencies = currenciesData.filter(c => c.active !== false);
@@ -1733,7 +1736,10 @@ function renderCurrencies() {
         const isFavorite = favorites.includes(currency.id);
         const changeClass = currency.change >= 0 ? 'positive' : 'negative';
         const changeIcon = currency.change >= 0 ? '↑' : '↓';
-        const market = 'official';
+        
+        // استخدام السوق الرسمي لعرض الشراء والبيع
+        const buyPrice = currency.official?.buy ?? 0;
+        const sellPrice = currency.official?.sell ?? 0;
         
         return `
             <div class="currency-card" data-id="${currency.id}">
@@ -1750,11 +1756,11 @@ function renderCurrencies() {
                 <div class="rates">
                     <div class="rate-item">
                         <div class="label">شراء</div>
-                        <div class="value">${currency[market]?.buy || '—'}</div>
+                        <div class="value">${buyPrice > 0 ? buyPrice : '—'}</div>
                     </div>
                     <div class="rate-item">
                         <div class="label">بيع</div>
-                        <div class="value">${currency[market]?.sell || '—'}</div>
+                        <div class="value">${sellPrice > 0 ? sellPrice : '—'}</div>
                     </div>
                 </div>
                 <div class="bottom-row">
@@ -1788,7 +1794,7 @@ function renderCurrencies() {
 }
 
 // =============================================
-// 15. FAVORITES
+// 14. FAVORITES
 // =============================================
 function toggleFavorite(id) {
     const index = favorites.indexOf(id);
@@ -1805,7 +1811,7 @@ function toggleFavorite(id) {
 }
 
 // =============================================
-// 16. SEARCH
+// 15. SEARCH
 // =============================================
 searchInput.addEventListener('input', () => {
     searchQuery = searchInput.value;
@@ -1821,7 +1827,7 @@ clearSearch.addEventListener('click', () => {
 });
 
 // =============================================
-// 17. FILTERS
+// 16. FILTERS
 // =============================================
 document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1833,16 +1839,16 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 });
 
 // =============================================
-// 18. MODAL
+// 17. MODAL
 // =============================================
 function openModal(currency) {
     modalFlag.textContent = currency.flag || '🏳️';
     modalName.textContent = `${currency.code} - ${currency.name || ''}`;
     
-    const officialBuy = currency.official?.buy || '—';
-    const officialSell = currency.official?.sell || '—';
-    const parallelBuy = currency.parallel?.buy || '—';
-    const parallelSell = currency.parallel?.sell || '—';
+    const officialBuy = currency.official?.buy ?? 0;
+    const officialSell = currency.official?.sell ?? 0;
+    const parallelBuy = currency.parallel?.buy ?? 0;
+    const parallelSell = currency.parallel?.sell ?? 0;
     
     modalBody.innerHTML = `
         <div class="detail-row">
@@ -1863,22 +1869,22 @@ function openModal(currency) {
             <h4 style="margin-bottom:12px;">🏦 السوق الرسمي</h4>
             <div class="detail-row">
                 <span class="label">شراء</span>
-                <span class="value">${officialBuy} SDG</span>
+                <span class="value">${officialBuy > 0 ? officialBuy + ' SDG' : '—'}</span>
             </div>
             <div class="detail-row">
                 <span class="label">بيع</span>
-                <span class="value">${officialSell} SDG</span>
+                <span class="value">${officialSell > 0 ? officialSell + ' SDG' : '—'}</span>
             </div>
         </div>
         <div style="margin-top:16px; padding-top:16px; border-top:2px solid var(--bg);">
             <h4 style="margin-bottom:12px;">💱 السوق الموازي</h4>
             <div class="detail-row">
                 <span class="label">شراء</span>
-                <span class="value">${parallelBuy} SDG</span>
+                <span class="value">${parallelBuy > 0 ? parallelBuy + ' SDG' : '—'}</span>
             </div>
             <div class="detail-row">
                 <span class="label">بيع</span>
-                <span class="value">${parallelSell} SDG</span>
+                <span class="value">${parallelSell > 0 ? parallelSell + ' SDG' : '—'}</span>
             </div>
         </div>
         <div style="margin-top:20px; padding-top:16px; border-top:2px solid var(--bg); text-align:center;">
@@ -1903,7 +1909,7 @@ modal.addEventListener('click', (e) => {
 });
 
 // =============================================
-// 19. CONVERTER
+// 18. CONVERTER
 // =============================================
 function renderConverterOptions() {
     const activeCurrencies = currenciesData.filter(c => c.active !== false);
@@ -1941,6 +1947,7 @@ function convertCurrency() {
         return;
     }
     
+    // الحصول على السعر حسب السوق (رسمي أو موازي) ونوع السعر (شراء أو بيع)
     const fromRate = fromCurrency[market]?.[priceType] || 0;
     const toRate = toCurrency[market]?.[priceType] || 0;
     
@@ -1952,7 +1959,10 @@ function convertCurrency() {
     
     const result = (amount / fromRate) * toRate;
     convertedAmount.textContent = result.toFixed(2);
-    convertedDetail.textContent = `${toCurrency.code} (${priceType === 'buy' ? 'شراء' : 'بيع'} - ${market === 'official' ? 'رسمي' : 'موازي'})`;
+    
+    const marketName = market === 'official' ? 'رسمي' : 'موازي';
+    const priceName = priceType === 'buy' ? 'شراء' : 'بيع';
+    convertedDetail.textContent = `${toCurrency.code} (${priceName} - ${marketName})`;
 }
 
 converterAmount.addEventListener('input', convertCurrency);
@@ -1970,7 +1980,7 @@ swapBtn.addEventListener('click', () => {
 });
 
 // =============================================
-// 20. MOBILE MENU
+// 19. MOBILE MENU
 // =============================================
 hamburger.addEventListener('click', () => {
     mainNav.classList.toggle('open');
@@ -1985,7 +1995,7 @@ mainNav.querySelectorAll('a').forEach(link => {
 });
 
 // =============================================
-// 21. LOGIN BUTTON
+// 20. LOGIN BUTTON
 // =============================================
 loginBtn.addEventListener('click', () => {
     const authModal = document.getElementById('authModal');
@@ -1998,7 +2008,7 @@ loginBtn.addEventListener('click', () => {
 });
 
 // =============================================
-// 22. AUTH STATE
+// 21. AUTH STATE
 // =============================================
 onAuthStateChanged(auth, (user) => {
     updateAuthUI(user);
@@ -2006,9 +2016,8 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // =============================================
-// 23. ADMIN PANEL BUTTON
+// 22. ADMIN PANEL BUTTON
 // =============================================
-// زر لوحة الإدارة - يظهر فقط للمدير
 document.addEventListener('click', (e) => {
     if (e.target.id === 'adminPanelBtn' || e.target.closest('#adminPanelBtn')) {
         window.location.href = 'admin.html';
@@ -2016,7 +2025,7 @@ document.addEventListener('click', (e) => {
 });
 
 // =============================================
-// 24. INIT
+// 23. INIT
 // =============================================
 await handleRedirectResult();
 
