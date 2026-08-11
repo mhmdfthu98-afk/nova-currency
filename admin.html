@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>MORRE STORE | لوحة التحكم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+
+        :root {
+            --primary: #F59E0B;
+            --primary-dark: #D97706;
+            --bg: #F8F9FA;
+            --white: #FFFFFF;
+            --dark: #1E293B;
+            --gray: #64748B;
+            --gray-light: #F1F5F9;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+            --success: #22C55E;
+            --danger: #EF4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { background: var(--bg); min-height: 100vh; padding-bottom: 80px; }
+
+        [data-theme="dark"] {
+            --bg: #0F172A;
+            --white: #1E293B;
+            --gray-light: #334155;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 16px 20px; }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            background: var(--white);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            padding: 8px 16px;
+            color: var(--dark);
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .page-title { font-size: 1.3rem; font-weight: 900; color: var(--dark); }
+        .admin-badge { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-card .stat-label { font-size: 0.6rem; color: var(--gray); font-weight: 600; }
+        .stat-card .stat-value { font-size: 1.3rem; font-weight: 900; color: var(--dark); margin-top: 2px; }
+        .stat-card .stat-icon { float: left; font-size: 1.2rem; color: var(--primary); opacity: 0.5; }
+
+        .admin-tabs {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding: 4px;
+            margin-bottom: 16px;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            flex-wrap: nowrap;
+        }
+
+        .admin-tabs .tab-btn {
+            padding: 8px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .admin-tabs .tab-btn:hover { background: rgba(245, 158, 11, 0.05); color: var(--dark); }
+        .admin-tabs .tab-btn.active { background: var(--primary); color: white; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .glass-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            margin-bottom: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .section-header h3 { font-size: 1rem; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 8px; }
+        .section-header h3 i { color: var(--primary); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 800;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: 'Cairo', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover { transform: scale(1.02); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25); }
+
+        .btn-sm {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn-sm.gold { background: var(--primary); color: white; }
+        .btn-sm.green { background: var(--success); color: white; }
+        .btn-sm.red { background: var(--danger); color: white; }
+        .btn-sm.blue { background: #3B82F6; color: white; }
+        .btn-sm.outline { background: transparent; color: var(--dark); border: 1px solid var(--gray-light); }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        table th { background: var(--gray-light); color: var(--dark); font-weight: 700; padding: 8px 10px; text-align: right; white-space: nowrap; }
+        table td { padding: 8px 10px; border-bottom: 1px solid var(--gray-light); color: var(--dark); }
+        table tr:hover td { background: rgba(245, 158, 11, 0.03); }
+
+        .status-badge {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .status-badge.pending { background: #FEF3C7; color: var(--primary); }
+        .status-badge.progress { background: #DBEAFE; color: #3B82F6; }
+        .status-badge.done { background: #D1FAE5; color: var(--success); }
+        .status-badge.cancelled { background: #FEE2E2; color: var(--danger); }
+        .status-badge.deposit { background: #D1FAE5; color: var(--success); }
+        .status-badge.withdraw { background: #FEE2E2; color: var(--danger); }
+
+        .input-field {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--gray-light);
+            font-size: 0.85rem;
+            background: var(--white);
+            font-family: 'Cairo', sans-serif;
+            color: var(--dark);
+        }
+        .input-field:focus { outline: none; border-color: var(--primary); }
+
+        .empty-state { text-align: center; padding: 30px 20px; color: var(--gray); }
+        .empty-state i { font-size: 3rem; color: #CBD5E1; display: block; margin-bottom: 12px; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 12px;
+            z-index: 9999;
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray);
+            font-size: 0.55rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            padding: 4px 12px;
+        }
+        .bottom-nav .nav-item i { font-size: 1.3rem; }
+        .bottom-nav .nav-item.active { color: var(--primary); }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 999999;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box h3 { font-size: 1.1rem; font-weight: 900; color: var(--dark); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .modal-close { float: left; background: none; border: none; font-size: 1.5rem; color: var(--gray); cursor: pointer; }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .admin-tabs .tab-btn { font-size: 0.6rem; padding: 6px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ===== HEADER ===== -->
+        <header class="page-header">
+            <a href="/" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
+            <div class="page-title">🖥️ لوحة التحكم</div>
+            <span class="admin-badge">👑 أدمن</span>
+            <button onclick="toggleTheme()" style="margin-right:auto;background:none;border:none;color:var(--dark);font-size:1.2rem;cursor:pointer;">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+        </header>
+
+        <!-- ===== STATS ===== -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><i class="stat-icon fas fa-chart-line"></i><div class="stat-value" id="statTotalSales">0</div><div class="stat-label">💰 إجمالي المبيعات</div></div>
+            <div class="stat-card"><i class="stat-icon fas fa-box"></i><div class="stat-value" id="statTotalOrders">0</div><div class="stat-label">📦 إجمالي الطلبات</div></div>
+            <div class="stat-card"><i class="stat-icon fas fa-users"></i><div class="stat-value" id="statTotalCustomers">0</div><div class="stat-label">👥 العملاء</div></div>
+            <div class="stat-card"><i class="stat-icon fas fa-clock"></i><div class="stat-value" id="statPendingOrders">0</div><div class="stat-label">⏳ معلقة</div></div>
+            <div class="stat-card"><i class="stat-icon fas fa-check-circle"></i><div class="stat-value" id="statCompletedOrders">0</div><div class="stat-label">✅ مكتملة</div></div>
+            <div class="stat-card"><i class="stat-icon fas fa-times-circle"></i><div class="stat-value" id="statCancelledOrders">0</div><div class="stat-label">❌ ملغية</div></div>
+            <div class="stat-card"><i class="stat-icon fas fa-wallet"></i><div class="stat-value" id="statWalletBalance">0</div><div class="stat-label">💰 رصيد المحفظة</div></div>
+        </div>
+
+        <!-- ===== TABS ===== -->
+        <div class="admin-tabs" id="adminTabs">
+            <button class="tab-btn active" data-tab="dashboard">📊 الرئيسية</button>
+            <button class="tab-btn" data-tab="orders">🧾 الطلبات</button>
+            <button class="tab-btn" data-tab="wallet">💳 المحفظة</button>
+            <button class="tab-btn" data-tab="deposits">💳 طلبات الإيداع</button>
+            <button class="tab-btn" data-tab="withdraws">💰 طلبات السحب</button>
+            <button class="tab-btn" data-tab="products">📦 المنتجات</button>
+            <button class="tab-btn" data-tab="customers">👥 العملاء</button>
+            <button class="tab-btn" data-tab="notifications">🔔 الإشعارات</button>
+            <button class="tab-btn" data-tab="settings">⚙️ الإعدادات</button>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- DASHBOARD -->
+        <!-- ============================================================ -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="glass-card">
+                <div class="section-header"><h3><i class="fas fa-clock"></i> آخر النشاطات</h3></div>
+                <div id="recentActivity"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>جاري التحميل...</p></div></div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ORDERS -->
+        <!-- ============================================================ -->
+        <div id="tab-orders" class="tab-content">
+            <div class="glass-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-clipboard-list"></i> إدارة الطلبات</h3>
+                    <span id="ordersCount" style="font-size:0.75rem;color:var(--gray);">0 طلب</span>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+                    <button class="btn-sm gold" onclick="filterOrders('all')">الكل</button>
+                    <button class="btn-sm outline" onclick="filterOrders('pending')">⏳ معلقة</button>
+                    <button class="btn-sm outline" onclick="filterOrders('progress')">⚡ قيد التنفيذ</button>
+                    <button class="btn-sm outline" onclick="filterOrders('done')">✅ مكتمل</button>
+                    <button class="btn-sm outline" onclick="filterOrders('cancelled')">❌ ملغي</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>#</th><th>المنتج</th><th>العميل</th><th>السعر</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                        <tbody id="ordersTable"><tr><td colspan="6" class="text-center text-dark-light">جاري التحميل...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- WALLET -->
+        <!-- ============================================================ -->
+        <div id="tab-wallet" class="tab-content">
+            <div class="glass-card">
+                <div class="section-header"><h3><i class="fas fa-wallet"></i> إدارة المحفظة</h3></div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px;" id="walletBalances">
+                    <div style="background:var(--gray-light);padding:12px;border-radius:12px;text-align:center;">
+                        <div style="font-size:0.6rem;color:var(--gray);">🏦 بنكك</div>
+                        <div style="font-weight:900;color:var(--dark);" id="walletBankak">0 ج.س</div>
+                    </div>
+                    <div style="background:var(--gray-light);padding:12px;border-radius:12px;text-align:center;">
+                        <div style="font-size:0.6rem;color:var(--gray);">📱 MyCash</div>
+                        <div style="font-weight:900;color:var(--dark);" id="walletMycash">0 ج.س</div>
+                    </div>
+                    <div style="background:var(--gray-light);padding:12px;border-radius:12px;text-align:center;">
+                        <div style="font-size:0.6rem;color:var(--gray);">🟡 Binance</div>
+                        <div style="font-weight:900;color:var(--dark);" id="walletBinance">0 ج.س</div>
+                    </div>
+                    <div style="background:var(--gray-light);padding:12px;border-radius:12px;text-align:center;">
+                        <div style="font-size:0.6rem;color:var(--gray);">💳 RedotPay</div>
+                        <div style="font-weight:900;color:var(--dark);" id="walletRedotpay">0 ج.س</div>
+                    </div>
+                    <div style="background:var(--primary);padding:12px;border-radius:12px;text-align:center;color:white;">
+                        <div style="font-size:0.6rem;opacity:0.8;">💰 الإجمالي</div>
+                        <div style="font-weight:900;" id="walletTotal">0 ج.س</div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>العميل</th><th>النوع</th><th>المبلغ</th><th>الطريقة</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+                        <tbody id="walletTransactionsTable"><tr><td colspan="6" class="text-center text-dark-light">لا توجد معاملات</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- DEPOSITS -->
+        <!-- ============================================================ -->
+        <div id="tab-deposits" class="tab-content">
+            <div class="glass-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-arrow-down"></i> طلبات الإيداع</h3>
+                    <span id="depositsCount" style="font-size:0.75rem;color:var(--gray);">0 طلب</span>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+                    <button class="btn-sm gold" onclick="filterDeposits('all')">الكل</button>
+                    <button class="btn-sm outline" onclick="filterDeposits('pending')">⏳ معلقة</button>
+                    <button class="btn-sm outline" onclick="filterDeposits('completed')">✅ مقبولة</button>
+                    <button class="btn-sm outline" onclick="filterDeposits('rejected')">❌ مرفوضة</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>العميل</th>
+                                <th>المبلغ</th>
+                                <th>الطريقة</th>
+                                <th>رقم العملية</th>
+                                <th>الصورة</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="depositsTable">
+                            <tr><td colspan="8" class="text-center text-dark-light">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- WITHDRAWS -->
+        <!-- ============================================================ -->
+        <div id="tab-withdraws" class="tab-content">
+            <div class="glass-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-arrow-up"></i> طلبات السحب</h3>
+                    <span id="withdrawsCount" style="font-size:0.75rem;color:var(--gray);">0 طلب</span>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+                    <button class="btn-sm gold" onclick="filterWithdraws('all')">الكل</button>
+                    <button class="btn-sm outline" onclick="filterWithdraws('pending')">⏳ معلقة</button>
+                    <button class="btn-sm outline" onclick="filterWithdraws('completed')">✅ مقبولة</button>
+                    <button class="btn-sm outline" onclick="filterWithdraws('rejected')">❌ مرفوضة</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>العميل</th>
+                                <th>المبلغ</th>
+                                <th>الطريقة</th>
+                                <th>رقم الحساب</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="withdrawsTable">
+                            <tr><td colspan="7" class="text-center text-dark-light">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PRODUCTS -->
+        <!-- ============================================================ -->
+        <div id="tab-products" class="tab-content">
+            <div class="glass-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-box"></i> إدارة المنتجات</h3>
+                    <button onclick="showAddProduct()" class="btn-primary">➕ إضافة</button>
+                </div>
+                <div id="addProductForm" style="display:none;background:var(--gray-light);padding:16px;border-radius:12px;margin-bottom:16px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <input type="text" id="prodName" class="input-field" placeholder="اسم المنتج">
+                        <input type="number" id="prodPrice" class="input-field" placeholder="السعر">
+                        <select id="prodCategory" class="input-field">
+                            <option value="pubg">🎮 PUBG</option>
+                            <option value="freefire">🔥 FreeFire</option>
+                            <option value="clash">👑 Clash</option>
+                            <option value="efootball">⚽ eFootball</option>
+                            <option value="netflix">🎬 Netflix</option>
+                            <option value="googleplay">🛍️ Google Play</option>
+                            <option value="steam">🎮 Steam</option>
+                        </select>
+                        <select id="prodStatus" class="input-field">
+                            <option value="active">✅ ظاهر</option>
+                            <option value="inactive">⛔ مخفي</option>
+                        </select>
+                    </div>
+                    <button onclick="addProduct()" class="btn-primary" style="width:100%;margin-top:10px;">💾 حفظ</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>المنتج</th><th>السعر</th><th>القسم</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                        <tbody id="productsTable"><tr><td colspan="5" class="text-center text-dark-light">جاري التحميل...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- CUSTOMERS -->
+        <!-- ============================================================ -->
+        <div id="tab-customers" class="tab-content">
+            <div class="glass-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-users"></i> إدارة العملاء</h3>
+                    <span id="customersCount" style="font-size:0.75rem;color:var(--gray);">0 عميل</span>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <input type="text" id="searchCustomer" class="input-field" placeholder="🔍 بحث عن عميل..." oninput="searchCustomers()">
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>الاسم</th><th>البريد</th><th>الطلبات</th><th>الرصيد</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                        <tbody id="customersTable"><tr><td colspan="6" class="text-center text-dark-light">جاري التحميل...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- NOTIFICATIONS -->
+        <!-- ============================================================ -->
+        <div id="tab-notifications" class="tab-content">
+            <div class="glass-card">
+                <div class="section-header"><h3><i class="fas fa-bell"></i> إدارة الإشعارات</h3></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div><label style="font-size:0.7rem;font-weight:700;color:var(--gray);">عنوان الإشعار</label><input type="text" id="notifTitle" class="input-field" placeholder="العنوان"></div>
+                    <div><label style="font-size:0.7rem;font-weight:700;color:var(--gray);">النوع</label>
+                        <select id="notifType" class="input-field"><option value="all">📢 للجميع</option><option value="single">👤 لعميل</option></select>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <label style="font-size:0.7rem;font-weight:700;color:var(--gray);">نص الإشعار</label>
+                    <textarea id="notifBody" class="input-field" rows="3" placeholder="نص الإشعار..."></textarea>
+                </div>
+                <button onclick="sendNotification()" class="btn-primary" style="width:100%;margin-top:10px;">📨 إرسال</button>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SETTINGS -->
+        <!-- ============================================================ -->
+        <div id="tab-settings" class="tab-content">
+            <div class="glass-card">
+                <div class="section-header"><h3><i class="fas fa-cog"></i> إعدادات المتجر</h3></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div><label style="font-size:0.7rem;font-weight:700;color:var(--gray);">اسم المتجر</label><input type="text" id="storeName" class="input-field" value="MORRE STORE"></div>
+                    <div><label style="font-size:0.7rem;font-weight:700;color:var(--gray);">رقم الهاتف</label><input type="text" id="storePhone" class="input-field" value="2490991305468"></div>
+                    <div><label style="font-size:0.7rem;font-weight:700;color:var(--gray);">البريد</label><input type="email" id="storeEmail" class="input-field" value="info@morrestore.com"></div>
+                </div>
+                <button onclick="saveSettings()" class="btn-primary" style="width:100%;margin-top:12px;">💾 حفظ</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>الرئيسية</span></a>
+        <a href="wallet.html" class="nav-item"><i class="fas fa-wallet"></i><span>المحفظة</span></a>
+        <a href="orders.html" class="nav-item"><i class="fas fa-box"></i><span>طلباتي</span></a>
+        <a href="support.html" class="nav-item"><i class="fas fa-headset"></i><span>الدعم</span></a>
+        <a href="admin.html" class="nav-item active"><i class="fas fa-cog"></i><span>لوحة التحكم</span></a>
+    </nav>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ===== ORDER DETAIL MODAL ===== -->
+    <div id="orderDetailModal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('orderDetailModal')">&times;</button>
+            <h3><i class="fas fa-file-invoice"></i> تفاصيل الطلب</h3>
+            <div id="orderDetailContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== IMAGE MODAL ===== -->
+    <div id="imageModal" class="modal-overlay">
+        <div class="modal-box" style="max-width:600px;">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3><i class="fas fa-image"></i> صورة الإيصال</h3>
+                <button onclick="closeModal('imageModal')" class="modal-close">&times;</button>
+            </div>
+            <div style="text-align:center;">
+                <img id="modalImage" src="" alt="صورة الإيصال" style="max-width:100%;max-height:500px;border-radius:8px;">
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button onclick="window.open(document.getElementById('modalImage').src,'_blank')" class="btn-primary">📷 فتح</button>
+                <button onclick="downloadImage()" class="btn-primary" style="background:var(--gray);">💾 تحميل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT مع Firebase -->
+    <!-- ============================================================ -->
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+            "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
+            "firebase/storage": "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"
+        }
+    }
+    </script>
+
+    <script type="module">
+        // ============================================================
+        //  MORRE STORE - ADMIN PANEL (مع Firebase)
+        // ============================================================
+
+        import { initializeApp } from "firebase/app";
+        import {
+            getFirestore, collection, doc, addDoc, getDoc, getDocs, setDoc, updateDoc,
+            deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, increment
+        } from "firebase/firestore";
+        import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+        // ===== Firebase Config =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0jzecEwKgHpxHpTi8Y-_bwwfzVdtgf3E",
+            authDomain: "khasmshop.firebaseapp.com",
+            projectId: "khasmshop",
+            storageBucket: "khasmshop.firebasestorage.app",
+            messagingSenderId: "238182001615",
+            appId: "1:238182001615:web:d77391030a40a481b440ba"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // ===== Variables =====
+        let allOrders = [];
+        let allCustomers = [];
+        let allProducts = [];
+        let allTransactions = [];
+        let allDeposits = [];
+        let allWithdraws = [];
+        let currentOrderFilter = 'all';
+        let depositFilter = 'all';
+        let withdrawFilter = 'all';
+        let currentUser = null;
+
+        // ============================================================
+        //  TOAST
+        // ============================================================
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        window.showToast = showToast;
+
+        // ============================================================
+        //  TABS
+        // ============================================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('tab-' + tabName);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('#adminTabs .tab-btn').forEach(el => el.classList.remove('active'));
+            const btn = document.querySelector(`#adminTabs .tab-btn[data-tab="${tabName}"]`);
+            if (btn) btn.classList.add('active');
+        }
+        window.switchTab = switchTab;
+
+        document.querySelectorAll('#adminTabs .tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchTab(this.dataset.tab);
+            });
+        });
+
+        // ============================================================
+        //  THEME
+        // ============================================================
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                icon.className = 'fas fa-moon';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                icon.className = 'fas fa-sun';
+            }
+        }
+        window.toggleTheme = toggleTheme;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeIcon').className = 'fas fa-sun';
+        }
+
+        // ============================================================
+        //  MODALS
+        // ============================================================
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        window.openModal = openModal;
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        window.closeModal = closeModal;
+
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('active');
+            });
+        });
+
+        // ============================================================
+        //  LOAD STATS
+        // ============================================================
+        async function loadStats() {
+            try {
+                const ordersSnap = await getDocs(collection(db, "orders"));
+                let totalSales = 0, totalOrders = 0, pending = 0, completed = 0, cancelled = 0;
+
+                ordersSnap.forEach(doc => {
+                    const order = doc.data();
+                    totalSales += order.price || 0;
+                    totalOrders++;
+                    if (order.status === 'قيد الانتظار' || order.status === 'pending') pending++;
+                    else if (order.status === 'مكتمل' || order.status === 'done') completed++;
+                    else if (order.status === 'ملغي' || order.status === 'cancelled') cancelled++;
+                });
+
+                const usersSnap = await getDocs(collection(db, "users"));
+                let totalBalance = 0;
+                usersSnap.forEach(doc => { totalBalance += doc.data().balance || 0; });
+
+                document.getElementById('statTotalSales').textContent = totalSales.toLocaleString();
+                document.getElementById('statTotalOrders').textContent = totalOrders;
+                document.getElementById('statTotalCustomers').textContent = usersSnap.size;
+                document.getElementById('statPendingOrders').textContent = pending;
+                document.getElementById('statCompletedOrders').textContent = completed;
+                document.getElementById('statCancelledOrders').textContent = cancelled;
+                document.getElementById('statWalletBalance').textContent = totalBalance.toLocaleString();
+
+            } catch (error) {
+                console.error('خطأ في الإحصائيات:', error);
+            }
+        }
+
+        // ============================================================
+        //  LOAD ORDERS
+        // ============================================================
+        function loadOrders() {
+            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                allOrders = [];
+                snapshot.forEach(doc => {
+                    allOrders.push({ id: doc.id, ...doc.data() });
+                });
+                renderOrders();
+                document.getElementById('ordersCount').textContent = allOrders.length + ' طلب';
+            });
+        }
+
+        function renderOrders() {
+            const table = document.getElementById('ordersTable');
+            let filtered = allOrders;
+
+            if (currentOrderFilter !== 'all') {
+                const map = {
+                    pending: ['قيد الانتظار', 'pending'],
+                    progress: ['قيد التنفيذ', 'progress'],
+                    done: ['مكتمل', 'done'],
+                    cancelled: ['ملغي', 'cancelled']
+                };
+                filtered = filtered.filter(o => map[currentOrderFilter].includes(o.status));
+            }
+
+            if (filtered.length === 0) {
+                table.innerHTML = `<tr><td colspan="6" class="text-center text-dark-light">لا توجد طلبات</td></tr>`;
+                return;
+            }
+
+            const statusMap = {
+                'قيد الانتظار': 'pending',
+                'pending': 'pending',
+                'قيد التنفيذ': 'progress',
+                'progress': 'progress',
+                'مكتمل': 'done',
+                'done': 'done',
+                'ملغي': 'cancelled',
+                'cancelled': 'cancelled'
+            };
+
+            table.innerHTML = filtered.map(o => `
+                <tr>
+                    <td>#${o.id?.substring(0, 6) || '---'}</td>
+                    <td>${o.product || 'غير محدد'}</td>
+                    <td>${o.userName || o.uName || 'مستخدم'}</td>
+                    <td>${(o.price || 0).toLocaleString()} ج.س</td>
+                    <td><span class="status-badge ${statusMap[o.status] || 'pending'}">${o.status || 'قيد الانتظار'}</span></td>
+                    <td>
+                        <button class="btn-sm blue" onclick="showOrderDetail('${o.id}')">📄</button>
+                        <button class="btn-sm green" onclick="updateOrder('${o.id}','مكتمل')">✅</button>
+                        <button class="btn-sm gold" onclick="updateOrder('${o.id}','قيد التنفيذ')">⚡</button>
+                        <button class="btn-sm red" onclick="updateOrder('${o.id}','ملغي')">❌</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ============================================================
+        //  UPDATE ORDER STATUS
+        // ============================================================
+        window.updateOrder = async function(orderId, status) {
+            if (!confirm(`⚠️ هل تريد تغيير حالة الطلب إلى ${status}؟`)) return;
+            try {
+                await updateDoc(doc(db, "orders", orderId), { status: status });
+                showToast(`✅ تم تحديث الحالة إلى ${status}`);
+            } catch (error) {
+                console.error('خطأ:', error);
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        // ============================================================
+        //  SHOW ORDER DETAIL
+        // ============================================================
+        window.showOrderDetail = function(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (!order) { showToast('❌ الطلب غير موجود'); return; }
+
+            const content = document.getElementById('orderDetailContent');
+            content.innerHTML = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.85rem;">
+                    <div><strong>رقم الطلب:</strong> #${order.id.substring(0, 8)}</div>
+                    <div><strong>العميل:</strong> ${order.userName || order.uName || 'غير محدد'}</div>
+                    <div><strong>المنتج:</strong> ${order.product || 'غير محدد'}</div>
+                    <div><strong>السعر:</strong> ${(order.price || 0).toLocaleString()} ج.س</div>
+                    <div><strong>اللعبة:</strong> ${order.game || 'غير محدد'}</div>
+                    <div><strong>الحالة:</strong> <span class="status-badge ${order.status === 'مكتمل' ? 'done' : order.status === 'قيد التنفيذ' ? 'progress' : order.status === 'ملغي' ? 'cancelled' : 'pending'}">${order.status || 'قيد الانتظار'}</span></div>
+                    <div><strong>طريقة الدفع:</strong> ${order.paymentMethod || 'رصيد المحفظة'}</div>
+                    <div><strong>التاريخ:</strong> ${order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleString('ar-SD') : 'غير محدد'}</div>
+                    ${order.whatsapp ? `<div style="grid-column:span 2;"><strong>📱 واتساب:</strong> ${order.whatsapp}</div>` : ''}
+                    ${order.gameID ? `<div style="grid-column:span 2;"><strong>🆔 معرف اللاعب:</strong> ${order.gameID}</div>` : ''}
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="btn-sm green" onclick="updateOrder('${order.id}','مكتمل')">✅ تم التنفيذ</button>
+                    <button class="btn-sm gold" onclick="updateOrder('${order.id}','قيد التنفيذ')">⚡ جاري التنفيذ</button>
+                    <button class="btn-sm red" onclick="updateOrder('${order.id}','ملغي')">❌ إلغاء</button>
+                    <button class="btn-sm blue" onclick="window.open('https://wa.me/${order.whatsapp || '2490991305468'}?text=مرحباً%20بخصوص%20طلبك%20#${order.id.substring(0,8)}','_blank')">📱 واتساب</button>
+                </div>
+            `;
+            openModal('orderDetailModal');
+        };
+
+        // ============================================================
+        //  FILTER ORDERS
+        // ============================================================
+        window.filterOrders = function(status) {
+            currentOrderFilter = status;
+            document.querySelectorAll('#tab-orders .btn-sm').forEach(b => b.className = 'btn-sm outline');
+            const activeBtn = document.querySelector(`#tab-orders .btn-sm[onclick="filterOrders('${status}')"]`);
+            if (activeBtn) activeBtn.className = 'btn-sm gold';
+            renderOrders();
+        };
+
+        // ============================================================
+        //  LOAD PRODUCTS
+        // ============================================================
+        function loadProducts() {
+            onSnapshot(collection(db, "products"), (snapshot) => {
+                allProducts = [];
+                snapshot.forEach(doc => {
+                    allProducts.push({ id: doc.id, ...doc.data() });
+                });
+                renderProducts();
+            });
+        }
+
+        function renderProducts() {
+            const table = document.getElementById('productsTable');
+            if (allProducts.length === 0) {
+                table.innerHTML = `<tr><td colspan="5" class="text-center text-dark-light">لا توجد منتجات</td></tr>`;
+                return;
+            }
+
+            const catNames = {
+                pubg: '🎮 PUBG',
+                freefire: '🔥 FreeFire',
+                clash: '👑 Clash',
+                efootball: '⚽ eFootball',
+                netflix: '🎬 Netflix',
+                googleplay: '🛍️ Google Play',
+                steam: '🎮 Steam'
+            };
+
+            table.innerHTML = allProducts.map(p => `
+                <tr>
+                    <td>${p.name || 'غير محدد'}</td>
+                    <td>${(p.price || 0).toLocaleString()} ج.س</td>
+                    <td>${catNames[p.category] || p.category || 'عام'}</td>
+                    <td><span class="status-badge ${p.isActive !== false ? 'done' : 'cancelled'}">${p.isActive !== false ? '✅ ظاهر' : '⛔ مخفي'}</span></td>
+                    <td>
+                        <button class="btn-sm gold" onclick="editProduct('${p.id}')">✏️</button>
+                        <button class="btn-sm red" onclick="deleteProduct('${p.id}')">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ============================================================
+        //  ADD PRODUCT
+        // ============================================================
+        window.showAddProduct = function() {
+            const form = document.getElementById('addProductForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        };
+
+        window.addProduct = async function() {
+            const name = document.getElementById('prodName').value.trim();
+            const price = parseInt(document.getElementById('prodPrice').value);
+            const category = document.getElementById('prodCategory').value;
+            const isActive = document.getElementById('prodStatus').value === 'active';
+
+            if (!name || !price) { showToast('❌ اسم المنتج والسعر مطلوبين'); return; }
+
+            try {
+                await addDoc(collection(db, "products"), {
+                    name, price, category, isActive,
+                    createdAt: serverTimestamp()
+                });
+                showToast('✅ تم إضافة المنتج');
+                document.getElementById('prodName').value = '';
+                document.getElementById('prodPrice').value = '';
+                document.getElementById('addProductForm').style.display = 'none';
+            } catch (error) {
+                console.error('خطأ:', error);
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        window.deleteProduct = async function(productId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا المنتج؟')) return;
+            try {
+                await deleteDoc(doc(db, "products", productId));
+                showToast('🗑️ تم حذف المنتج');
+            } catch (error) {
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        window.editProduct = function(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) { showToast('❌ المنتج غير موجود'); return; }
+            const newPrice = prompt('💰 أدخل السعر الجديد:', product.price);
+            if (newPrice && !isNaN(newPrice)) {
+                updateDoc(doc(db, "products", productId), { price: parseInt(newPrice) })
+                    .then(() => showToast('✅ تم تحديث السعر'))
+                    .catch(() => showToast('❌ حدث خطأ'));
+            }
+        };
+
+        // ============================================================
+        //  LOAD CUSTOMERS
+        // ============================================================
+        function loadCustomers() {
+            onSnapshot(collection(db, "users"), (snapshot) => {
+                allCustomers = [];
+                snapshot.forEach(doc => {
+                    allCustomers.push({ id: doc.id, ...doc.data() });
+                });
+                renderCustomers();
+                document.getElementById('customersCount').textContent = allCustomers.length + ' عميل';
+            });
+        }
+
+        function renderCustomers() {
+            const table = document.getElementById('customersTable');
+            if (allCustomers.length === 0) {
+                table.innerHTML = `<tr><td colspan="6" class="text-center text-dark-light">لا يوجد عملاء</td></tr>`;
+                return;
+            }
+
+            const orderCounts = {};
+            allOrders.forEach(o => {
+                const uid = o.uID || o.userId;
+                if (uid) orderCounts[uid] = (orderCounts[uid] || 0) + 1;
+            });
+
+            table.innerHTML = allCustomers.map(c => `
+                <tr>
+                    <td>${c.name || 'مستخدم'}</td>
+                    <td>${c.email || 'غير محدد'}</td>
+                    <td>${orderCounts[c.id] || 0} طلب</td>
+                    <td>${(c.balance || 0).toLocaleString()} ج.س</td>
+                    <td><span class="status-badge ${c.isActive !== false ? 'done' : 'cancelled'}">${c.isActive !== false ? '✅ نشط' : '⛔ موقوف'}</span></td>
+                    <td>
+                        <button class="btn-sm blue" onclick="showCustomer('${c.id}')">🔍</button>
+                        <button class="btn-sm gold" onclick="toggleCustomer('${c.id}')">${c.isActive !== false ? '⛔' : '✅'}</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.toggleCustomer = async function(userId) {
+            const user = allCustomers.find(c => c.id === userId);
+            if (!user) return;
+            try {
+                await updateDoc(doc(db, "users", userId), { isActive: user.isActive === false });
+                showToast(user.isActive === false ? '✅ تم التفعيل' : '⛔ تم الإيقاف');
+            } catch (error) {
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        window.showCustomer = function(userId) {
+            const user = allCustomers.find(c => c.id === userId);
+            if (!user) { showToast('❌ المستخدم غير موجود'); return; }
+            alert(`👤 ${user.name || 'مستخدم'}\n📧 ${user.email || 'غير محدد'}\n💰 ${(user.balance || 0).toLocaleString()} ج.س\n📱 #${user.walletID || 'غير محدد'}`);
+        };
+
+        // ============================================================
+        //  SEARCH CUSTOMERS
+        // ============================================================
+        window.searchCustomers = function() {
+            const query = document.getElementById('searchCustomer').value.toLowerCase();
+            const rows = document.querySelectorAll('#customersTable tr');
+            rows.forEach(row => {
+                if (row.querySelector('.text-center')) return;
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        };
+
+        // ============================================================
+        //  WALLET BALANCES
+        // ============================================================
+        async function loadWalletBalances() {
+            try {
+                const methods = ['bankak', 'mycash', 'binance', 'redotpay'];
+                let total = 0;
+                for (const method of methods) {
+                    const q = query(collection(db, "transactions"), where("method", "==", method));
+                    const snap = await getDocs(q);
+                    let balance = 0;
+                    snap.forEach(doc => {
+                        const t = doc.data();
+                        if (t.status === 'completed' || t.status === 'مكتمل') {
+                            balance += t.amount || 0;
+                        }
+                    });
+                    const element = document.getElementById(`wallet${method.charAt(0).toUpperCase() + method.slice(1)}`);
+                    if (element) element.textContent = balance.toLocaleString() + ' ج.س';
+                    total += balance;
+                }
+                document.getElementById('walletTotal').textContent = total.toLocaleString() + ' ج.س';
+            } catch (error) {
+                console.error('خطأ في تحميل أرصدة المحفظة:', error);
+            }
+        }
+
+        // ============================================================
+        //  LOAD TRANSACTIONS
+        // ============================================================
+        function loadTransactions() {
+            const q = query(collection(db, "transactions"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                allTransactions = [];
+                snapshot.forEach(doc => {
+                    allTransactions.push({ id: doc.id, ...doc.data() });
+                });
+                renderWalletTransactions();
+            });
+        }
+
+        function renderWalletTransactions() {
+            const table = document.getElementById('walletTransactionsTable');
+            if (allTransactions.length === 0) {
+                table.innerHTML = `<tr><td colspan="6" class="text-center text-dark-light">لا توجد معاملات</td></tr>`;
+                return;
+            }
+
+            const statusMap = {
+                pending: 'pending',
+                completed: 'done',
+                rejected: 'cancelled'
+            };
+
+            table.innerHTML = allTransactions.slice(0, 20).map(t => {
+                const date = t.createdAt?.toDate ? new Date(t.createdAt.toDate()) : new Date();
+                return `
+                    <tr>
+                        <td>${t.userName || t.uName || 'مستخدم'}</td>
+                        <td><span class="status-badge ${t.type === 'deposit' ? 'done' : t.type === 'withdraw' ? 'cancelled' : 'progress'}">${t.type || 'شراء'}</span></td>
+                        <td style="${t.amount > 0 ? 'color:var(--success)' : 'color:var(--danger)'}">${(t.amount || 0).toLocaleString()} ج.س</td>
+                        <td>${t.method || 'غير محدد'}</td>
+                        <td><span class="status-badge ${statusMap[t.status] || 'pending'}">${t.status || 'قيد المراجعة'}</span></td>
+                        <td>${date.toLocaleDateString('ar-SD')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        //  LOAD DEPOSITS
+        // ============================================================
+        function loadDeposits() {
+            const q = query(collection(db, "transactions"), where("type", "==", "deposit"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                allDeposits = [];
+                snapshot.forEach(doc => {
+                    allDeposits.push({ id: doc.id, ...doc.data() });
+                });
+                renderDeposits();
+                document.getElementById('depositsCount').textContent = allDeposits.length + ' طلب';
+            });
+        }
+
+        function renderDeposits() {
+            const table = document.getElementById('depositsTable');
+            let filtered = allDeposits;
+
+            if (depositFilter !== 'all') {
+                filtered = filtered.filter(d => d.status === depositFilter);
+            }
+
+            if (filtered.length === 0) {
+                table.innerHTML = `<tr><td colspan="8" class="text-center text-dark-light">لا توجد طلبات إيداع</td></tr>`;
+                return;
+            }
+
+            const statusMap = {
+                pending: '<span class="status-badge pending">⏳ معلق</span>',
+                completed: '<span class="status-badge done">✅ مقبول</span>',
+                rejected: '<span class="status-badge cancelled">❌ مرفوض</span>'
+            };
+
+            table.innerHTML = filtered.map(d => `
+                <tr>
+                    <td>#${d.id?.substring(0, 6) || '---'}</td>
+                    <td>${d.userName || 'مستخدم'}</td>
+                    <td style="color:var(--success);">+${(d.amount || 0).toLocaleString()} ج.س</td>
+                    <td>${d.method || 'غير محدد'}</td>
+                    <td>${d.reference || 'غير محدد'}</td>
+                    <td>
+                        ${d.proofURL ? `<button class="btn-sm blue" onclick="viewImage('${d.proofURL}')">📷</button>` : 'لا توجد'}
+                    </td>
+                    <td>${statusMap[d.status] || statusMap.pending}</td>
+                    <td>
+                        ${d.status === 'pending' ? `
+                            <button class="btn-sm green" onclick="approveDeposit('${d.id}', ${d.amount || 0}, '${d.uID || ''}')">قبول</button>
+                            <button class="btn-sm red" onclick="rejectDeposit('${d.id}')">رفض</button>
+                        ` : `
+                            <button class="btn-sm outline" onclick="showDepositDetail('${d.id}')">📄</button>
+                        `}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ============================================================
+        //  APPROVE DEPOSIT
+        // ============================================================
+        window.approveDeposit = async function(id, amount, userId) {
+            if (!confirm('⚠️ هل تريد قبول هذا الإيداع؟')) return;
+            try {
+                await updateDoc(doc(db, "transactions", id), {
+                    status: "completed",
+                    adminNote: "تم قبول الإيداع",
+                    approvedAt: serverTimestamp()
+                });
+
+                if (userId) {
+                    await updateDoc(doc(db, "users", userId), {
+                        balance: increment(amount)
+                    });
+                }
+
+                showToast('✅ تم قبول الإيداع وتم إضافة الرصيد');
+            } catch (error) {
+                console.error('خطأ:', error);
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        // ============================================================
+        //  REJECT DEPOSIT
+        // ============================================================
+        window.rejectDeposit = async function(id) {
+            if (!confirm('⚠️ هل تريد رفض هذا الإيداع؟')) return;
+            try {
+                await updateDoc(doc(db, "transactions", id), {
+                    status: "rejected",
+                    adminNote: "تم رفض الإيداع"
+                });
+                showToast('❌ تم رفض الإيداع');
+            } catch (error) {
+                console.error('خطأ:', error);
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        // ============================================================
+        //  FILTER DEPOSITS
+        // ============================================================
+        window.filterDeposits = function(status) {
+            depositFilter = status;
+            document.querySelectorAll('#tab-deposits .btn-sm').forEach(b => b.className = 'btn-sm outline');
+            const activeBtn = document.querySelector(`#tab-deposits .btn-sm[onclick="filterDeposits('${status}')"]`);
+            if (activeBtn) activeBtn.className = 'btn-sm gold';
+            renderDeposits();
+        };
+
+        // ============================================================
+        //  SHOW DEPOSIT DETAIL
+        // ============================================================
+        window.showDepositDetail = function(id) {
+            const deposit = allDeposits.find(d => d.id === id);
+            if (!deposit) { showToast('❌ غير موجود'); return; }
+            const date = deposit.createdAt?.toDate ? new Date(deposit.createdAt.toDate()) : new Date();
+            alert(`📋 تفاصيل الإيداع
+
+📌 العميل: ${deposit.userName || 'مستخدم'}
+💰 المبلغ: ${(deposit.amount || 0).toLocaleString()} ج.س
+📅 التاريخ: ${date.toLocaleString('ar-SD')}
+📱 الطريقة: ${deposit.method || 'غير محدد'}
+🔢 رقم العملية: ${deposit.reference || 'غير محدد'}
+📊 الحالة: ${deposit.status || 'قيد المراجعة'}
+📎 ملاحظات: ${deposit.adminNote || 'لا توجد'}`);
+        };
+
+        // ============================================================
+        //  LOAD WITHDRAWS
+        // ============================================================
+        function loadWithdraws() {
+            const q = query(collection(db, "transactions"), where("type", "==", "withdraw"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                allWithdraws = [];
+                snapshot.forEach(doc => {
+                    allWithdraws.push({ id: doc.id, ...doc.data() });
+                });
+                renderWithdraws();
+                document.getElementById('withdrawsCount').textContent = allWithdraws.length + ' طلب';
+            });
+        }
+
+        function renderWithdraws() {
+            const table = document.getElementById('withdrawsTable');
+            let filtered = allWithdraws;
+
+            if (withdrawFilter !== 'all') {
+                filtered = filtered.filter(d => d.status === withdrawFilter);
+            }
+
+            if (filtered.length === 0) {
+                table.innerHTML = `<tr><td colspan="7" class="text-center text-dark-light">لا توجد طلبات سحب</td></tr>`;
+                return;
+            }
+
+            const statusMap = {
+                pending: '<span class="status-badge pending">⏳ معلق</span>',
+                completed: '<span class="status-badge done">✅ مقبول</span>',
+                rejected: '<span class="status-badge cancelled">❌ مرفوض</span>'
+            };
+
+            table.innerHTML = filtered.map(d => `
+                <tr>
+                    <td>#${d.id?.substring(0, 6) || '---'}</td>
+                    <td>${d.userName || 'مستخدم'}</td>
+                    <td style="color:var(--danger);">${(d.amount || 0).toLocaleString()} ج.س</td>
+                    <td>${d.method || 'غير محدد'}</td>
+                    <td>${d.account || 'غير محدد'}</td>
+                    <td>${statusMap[d.status] || statusMap.pending}</td>
+                    <td>
+                        ${d.status === 'pending' ? `
+                            <button class="btn-sm green" onclick="approveWithdraw('${d.id}', ${Math.abs(d.amount || 0)}, '${d.uID || ''}')">قبول</button>
+                            <button class="btn-sm red" onclick="rejectWithdraw('${d.id}')">رفض</button>
+                        ` : `
+                            <button class="btn-sm outline" onclick="showWithdrawDetail('${d.id}')">📄</button>
+                        `}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ============================================================
+        //  APPROVE WITHDRAW
+        // ============================================================
+        window.approveWithdraw = async function(id, amount, userId) {
+            if (!confirm('⚠️ هل تريد قبول طلب السحب؟')) return;
+            try {
+                await updateDoc(doc(db, "transactions", id), {
+                    status: "completed",
+                    adminNote: "تم قبول السحب",
+                    approvedAt: serverTimestamp()
+                });
+
+                if (userId) {
+                    await updateDoc(doc(db, "users", userId), {
+                        balance: increment(-amount)
+                    });
+                }
+
+                showToast('✅ تم قبول السحب وتم خصم الرصيد');
+            } catch (error) {
+                console.error('خطأ:', error);
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        // ============================================================
+        //  REJECT WITHDRAW
+        // ============================================================
+        window.rejectWithdraw = async function(id) {
+            if (!confirm('⚠️ هل تريد رفض طلب السحب؟')) return;
+            try {
+                await updateDoc(doc(db, "transactions", id), {
+                    status: "rejected",
+                    adminNote: "تم رفض السحب"
+                });
+                showToast('❌ تم رفض السحب');
+            } catch (error) {
+                console.error('خطأ:', error);
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        // ============================================================
+        //  FILTER WITHDRAWS
+        // ============================================================
+        window.filterWithdraws = function(status) {
+            withdrawFilter = status;
+            document.querySelectorAll('#tab-withdraws .btn-sm').forEach(b => b.className = 'btn-sm outline');
+            const activeBtn = document.querySelector(`#tab-withdraws .btn-sm[onclick="filterWithdraws('${status}')"]`);
+            if (activeBtn) activeBtn.className = 'btn-sm gold';
+            renderWithdraws();
+        };
+
+        // ============================================================
+        //  SHOW WITHDRAW DETAIL
+        // ============================================================
+        window.showWithdrawDetail = function(id) {
+            const withdraw = allWithdraws.find(d => d.id === id);
+            if (!withdraw) { showToast('❌ غير موجود'); return; }
+            const date = withdraw.createdAt?.toDate ? new Date(withdraw.createdAt.toDate()) : new Date();
+            alert(`📋 تفاصيل السحب
+
+📌 العميل: ${withdraw.userName || 'مستخدم'}
+💰 المبلغ: ${(withdraw.amount || 0).toLocaleString()} ج.س
+📅 التاريخ: ${date.toLocaleString('ar-SD')}
+📱 الطريقة: ${withdraw.method || 'غير محدد'}
+🔢 رقم الحساب: ${withdraw.account || 'غير محدد'}
+📊 الحالة: ${withdraw.status || 'قيد المراجعة'}
+📎 ملاحظات: ${withdraw.adminNote || 'لا توجد'}`);
+        };
+
+        // ============================================================
+        //  VIEW IMAGE
+        // ============================================================
+        window.viewImage = function(url) {
+            document.getElementById('modalImage').src = url;
+            openModal('imageModal');
+        };
+
+        window.downloadImage = function() {
+            const url = document.getElementById('modalImage').src;
+            window.open(url, '_blank');
+        };
+
+        // ============================================================
+        //  NOTIFICATIONS
+        // ============================================================
+        window.sendNotification = async function() {
+            const title = document.getElementById('notifTitle').value.trim();
+            const body = document.getElementById('notifBody').value.trim();
+
+            if (!title || !body) { showToast('❌ عنوان ونص الإشعار مطلوبين'); return; }
+
+            try {
+                await addDoc(collection(db, "notifications"), {
+                    title,
+                    body,
+                    type: document.getElementById('notifType').value,
+                    createdAt: serverTimestamp()
+                });
+                showToast('✅ تم إرسال الإشعار');
+                document.getElementById('notifTitle').value = '';
+                document.getElementById('notifBody').value = '';
+            } catch (error) {
+                console.error('خطأ:', error);
+                showToast('❌ حدث خطأ');
+            }
+        };
+
+        // ============================================================
+        //  SETTINGS
+        // ============================================================
+        window.saveSettings = function() {
+            const name = document.getElementById('storeName').value.trim();
+            if (!name) { showToast('❌ اسم المتجر مطلوب'); return; }
+            localStorage.setItem('storeSettings', JSON.stringify({
+                name: name,
+                phone: document.getElementById('storePhone').value,
+                email: document.getElementById('storeEmail').value
+            }));
+            showToast('✅ تم حفظ الإعدادات');
+        };
+
+        // ============================================================
+        //  LOAD RECENT ACTIVITY
+        // ============================================================
+        function loadRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"), where("status", "in", ["قيد الانتظار", "pending"]));
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>لا توجد نشاطات حديثة</p></div>`;
+                    return;
+                }
+                let html = '';
+                snapshot.forEach(doc => {
+                    const o = doc.data();
+                    const date = o.createdAt?.toDate ? new Date(o.createdAt.toDate()) : new Date();
+                    html += `
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <div><span class="text-sm">🛒 طلب جديد من <strong>${o.userName || o.uName || 'مستخدم'}</strong></span></div>
+                            <span class="text-xs text-dark-light">${date.toLocaleTimeString('ar-SA', {hour:'2-digit',minute:'2-digit'})}</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html || `<div class="empty-state"><i class="fas fa-inbox"></i><p>لا توجد نشاطات</p></div>`;
+            });
+        }
+
+        // ============================================================
+        //  AUTH CHECK
+        // ============================================================
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loadStats();
+                loadOrders();
+                loadProducts();
+                loadCustomers();
+                loadTransactions();
+                loadWalletBalances();
+                loadRecentActivity();
+                loadDeposits();
+                loadWithdraws();
+            } else {
+                showToast('❌ يرجى تسجيل الدخول');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            }
+        });
+
+        console.log('🖥️ MORRE STORE - Admin Panel with Firebase');
+    </script>
+
+</body>
+</html>
