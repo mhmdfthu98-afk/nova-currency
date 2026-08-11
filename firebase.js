@@ -94,4 +94,24 @@ export {
     onSnapshot,
     serverTimestamp,
     Timestamp
+
+// =============================================
+// ADDITIONAL EXPORTS FOR PRO
+// =============================================
+
+export {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    addDoc,
+    query,
+    where,
+    orderBy,
+    onSnapshot,
+    serverTimestamp,
+    Timestamp
 };
