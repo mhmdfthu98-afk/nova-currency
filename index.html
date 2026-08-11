@@ -1230,54 +1230,180 @@ const swapBtn = document.getElementById('swapCurrencies');
 const convertedAmount = document.getElementById('convertedAmount');
 const convertedDetail = document.getElementById('convertedDetail');
 
+
+    // =============================================
+// 4. AUTH MODAL - VERSION 2
 // =============================================
-// 4. AUTH MODAL
-// =============================================
-// إنشاء Modal تسجيل الدخول تلقائياً
 function createAuthModal() {
     const modalHTML = `
         <div class="modal-overlay" id="authModal" style="display:none;">
-            <div class="modal" style="max-width:400px;">
+            <div class="modal" style="max-width:420px;">
                 <div class="modal-header">
-                    <div class="title" style="font-size:20px;">🔑 تسجيل الدخول</div>
+                    <div class="title" style="font-size:20px;" id="authModalTitle">🔑 تسجيل الدخول</div>
                     <button class="modal-close" id="authModalClose">✕</button>
                 </div>
                 <div class="modal-body">
-                    <div id="authForm">
-                        <div style="margin-bottom:16px;">
-                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">البريد الإلكتروني</label>
-                            <input type="email" id="authEmail" placeholder="example@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;">
-                        </div>
-                        <div style="margin-bottom:16px;">
-                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">كلمة المرور</label>
-                            <input type="password" id="authPassword" placeholder="••••••••" style="width:100%;padding:12px 16px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;">
-                        </div>
-                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-                            <button id="authLoginBtn" class="btn btn-primary" style="flex:1;">تسجيل الدخول</button>
-                            <button id="authRegisterBtn" class="btn" style="flex:1;background:var(--secondary);color:white;">إنشاء حساب</button>
-                        </div>
-                        <button id="authGoogleBtn" class="btn" style="width:100%;background:#4285F4;color:white;margin-bottom:10px;">🔵 تسجيل الدخول بـ Google</button>
-                        <button id="authResetBtn" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:14px;width:100%;">نسيت كلمة المرور؟</button>
-                        <div id="authMessage" style="margin-top:12px;text-align:center;font-size:14px;color:var(--error);"></div>
+                    <!-- Tabs -->
+                    <div style="display:flex; gap:10px; margin-bottom:20px; background:var(--bg); border-radius:12px; padding:4px;">
+                        <button id="authLoginTab" class="auth-tab active" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:600; cursor:pointer; background:var(--primary); color:white; transition:var(--transition);">
+                            🔑 تسجيل الدخول
+                        </button>
+                        <button id="authRegisterTab" class="auth-tab" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:600; cursor:pointer; background:transparent; color:var(--text-secondary); transition:var(--transition);">
+                            📝 إنشاء حساب
+                        </button>
                     </div>
-                    <div id="authUserInfo" style="display:none;text-align:center;padding:20px;">
-                        <div style="font-size:48px;margin-bottom:12px;">👤</div>
-                        <h3 id="authUserEmail">user@email.com</h3>
-                        <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-                            <button id="authLogoutBtn" class="btn" style="background:var(--error);color:white;">تسجيل خروج</button>
-                            ${isAdmin ? '<button id="adminPanelBtn" class="btn btn-primary">⚙️ لوحة الإدارة</button>' : ''}
+
+                    <!-- Login Form -->
+                    <div id="loginForm">
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">📧 البريد الإلكتروني</label>
+                            <input type="email" id="loginEmail" placeholder="example@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;transition:var(--transition);">
                         </div>
+                        <div style="margin-bottom:16px; position:relative;">
+                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">🔒 كلمة المرور</label>
+                            <input type="password" id="loginPassword" placeholder="••••••••" style="width:100%;padding:12px 16px;padding-left:50px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;transition:var(--transition);">
+                            <button type="button" id="loginTogglePassword" style="position:absolute; left:12px; bottom:12px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">
+                                👁️
+                            </button>
+                        </div>
+                        <button id="authLoginBtn" class="btn btn-primary" style="width:100%; padding:14px;">🔑 تسجيل الدخول</button>
+                        <button id="authResetBtn" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:14px;width:100%;margin-top:12px;">🔓 نسيت كلمة المرور؟</button>
                     </div>
+
+                    <!-- Register Form -->
+                    <div id="registerForm" style="display:none;">
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">📧 البريد الإلكتروني</label>
+                            <input type="email" id="registerEmail" placeholder="example@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;transition:var(--transition);">
+                        </div>
+                        <div style="margin-bottom:16px; position:relative;">
+                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">🔒 كلمة المرور</label>
+                            <input type="password" id="registerPassword" placeholder="•••••••• (6 أحرف على الأقل)" style="width:100%;padding:12px 16px;padding-left:50px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;transition:var(--transition);">
+                            <button type="button" id="registerTogglePassword" style="position:absolute; left:12px; bottom:12px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">
+                                👁️
+                            </button>
+                        </div>
+                        <div style="margin-bottom:16px; position:relative;">
+                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">🔒 تأكيد كلمة المرور</label>
+                            <input type="password" id="registerConfirmPassword" placeholder="••••••••" style="width:100%;padding:12px 16px;padding-left:50px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;transition:var(--transition);">
+                            <button type="button" id="registerToggleConfirmPassword" style="position:absolute; left:12px; bottom:12px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">
+                                👁️
+                            </button>
+                        </div>
+                        <button id="authRegisterBtn" class="btn" style="width:100%; padding:14px; background:var(--secondary); color:white;">📝 إنشاء حساب</button>
+                    </div>
+
+                    <!-- Divider -->
+                    <div style="display:flex; align-items:center; gap:16px; margin:20px 0;">
+                        <div style="flex:1; height:1px; background:var(--bg);"></div>
+                        <span style="color:var(--text-secondary); font-size:14px;">أو</span>
+                        <div style="flex:1; height:1px; background:var(--bg);"></div>
+                    </div>
+
+                    <!-- Google Button -->
+                    <button id="authGoogleBtn" class="btn" style="width:100%; background:#4285F4; color:white; padding:14px; display:flex; align-items:center; justify-content:center; gap:10px;">
+                        <span style="font-size:20px;">🅶</span> تسجيل الدخول بـ Google
+                    </button>
+
+                    <!-- Message -->
+                    <div id="authMessage" style="margin-top:16px; text-align:center; font-size:14px; min-height:24px; color:var(--error);"></div>
                 </div>
             </div>
         </div>
     `;
+    
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    // إضافة الأحداث
+    // =========================================
+    // DOM REFS
+    // =========================================
     const authModal = document.getElementById('authModal');
     const authModalClose = document.getElementById('authModalClose');
+    const authModalTitle = document.getElementById('authModalTitle');
     
+    // Tabs
+    const loginTab = document.getElementById('authLoginTab');
+    const registerTab = document.getElementById('authRegisterTab');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    
+    // Login
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginTogglePassword = document.getElementById('loginTogglePassword');
+    const loginBtn = document.getElementById('authLoginBtn');
+    
+    // Register
+    const registerEmail = document.getElementById('registerEmail');
+    const registerPassword = document.getElementById('registerPassword');
+    const registerConfirmPassword = document.getElementById('registerConfirmPassword');
+    const registerTogglePassword = document.getElementById('registerTogglePassword');
+    const registerToggleConfirmPassword = document.getElementById('registerToggleConfirmPassword');
+    const registerBtn = document.getElementById('authRegisterBtn');
+    
+    // Others
+    const resetBtn = document.getElementById('authResetBtn');
+    const googleBtn = document.getElementById('authGoogleBtn');
+    const message = document.getElementById('authMessage');
+    
+    // =========================================
+    // TAB SWITCHING
+    // =========================================
+    function switchToLogin() {
+        loginTab.classList.add('active');
+        loginTab.style.background = 'var(--primary)';
+        loginTab.style.color = 'white';
+        registerTab.classList.remove('active');
+        registerTab.style.background = 'transparent';
+        registerTab.style.color = 'var(--text-secondary)';
+        
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        authModalTitle.textContent = '🔑 تسجيل الدخول';
+        message.textContent = '';
+    }
+    
+    function switchToRegister() {
+        registerTab.classList.add('active');
+        registerTab.style.background = 'var(--secondary)';
+        registerTab.style.color = 'white';
+        loginTab.classList.remove('active');
+        loginTab.style.background = 'transparent';
+        loginTab.style.color = 'var(--text-secondary)';
+        
+        registerForm.style.display = 'block';
+        loginForm.style.display = 'none';
+        authModalTitle.textContent = '📝 إنشاء حساب جديد';
+        message.textContent = '';
+    }
+    
+    loginTab.addEventListener('click', switchToLogin);
+    registerTab.addEventListener('click', switchToRegister);
+    
+    // =========================================
+    // TOGGLE PASSWORD VISIBILITY
+    // =========================================
+    function togglePassword(input, button) {
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        button.textContent = isPassword ? '🙈' : '👁️';
+    }
+    
+    loginTogglePassword.addEventListener('click', () => {
+        togglePassword(loginPassword, loginTogglePassword);
+    });
+    
+    registerTogglePassword.addEventListener('click', () => {
+        togglePassword(registerPassword, registerTogglePassword);
+    });
+    
+    registerToggleConfirmPassword.addEventListener('click', () => {
+        togglePassword(registerConfirmPassword, registerToggleConfirmPassword);
+    });
+    
+    // =========================================
+    // CLOSE MODAL
+    // =========================================
     authModalClose.addEventListener('click', () => {
         authModal.style.display = 'none';
     });
@@ -1286,15 +1412,136 @@ function createAuthModal() {
         if (e.target === authModal) authModal.style.display = 'none';
     });
     
-    // أحداث النماذج
-    document.getElementById('authLoginBtn').addEventListener('click', handleLogin);
-    document.getElementById('authRegisterBtn').addEventListener('click', handleRegister);
-    document.getElementById('authGoogleBtn').addEventListener('click', handleGoogleLogin);
-    document.getElementById('authResetBtn').addEventListener('click', handleResetPassword);
-    document.getElementById('authLogoutBtn').addEventListener('click', handleLogout);
+    // =========================================
+    // LOGIN HANDLER
+    // =========================================
+    loginBtn.addEventListener('click', async () => {
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value;
+        
+        if (!email || !password) {
+            message.textContent = '⚠️ الرجاء إدخال البريد الإلكتروني وكلمة المرور';
+            message.style.color = 'var(--error)';
+            return;
+        }
+        
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            message.textContent = '✅ تم تسجيل الدخول بنجاح';
+            message.style.color = 'var(--success)';
+            setTimeout(() => {
+                authModal.style.display = 'none';
+                loginEmail.value = '';
+                loginPassword.value = '';
+                message.textContent = '';
+            }, 1000);
+        } catch (error) {
+            message.textContent = `❌ ${getAuthErrorMessage(error.code)}`;
+            message.style.color = 'var(--error)';
+        }
+    });
+    
+    // =========================================
+    // REGISTER HANDLER
+    // =========================================
+    registerBtn.addEventListener('click', async () => {
+        const email = registerEmail.value.trim();
+        const password = registerPassword.value;
+        const confirmPassword = registerConfirmPassword.value;
+        
+        if (!email || !password || !confirmPassword) {
+            message.textContent = '⚠️ الرجاء ملء جميع الحقول';
+            message.style.color = 'var(--error)';
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            message.textContent = '⚠️ كلمة المرور غير متطابقة مع التأكيد';
+            message.style.color = 'var(--error)';
+            return;
+        }
+        
+        if (password.length < 6) {
+            message.textContent = '⚠️ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+            message.style.color = 'var(--error)';
+            return;
+        }
+        
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            message.textContent = '✅ تم إنشاء الحساب بنجاح! مرحباً بك 🎉';
+            message.style.color = 'var(--success)';
+            setTimeout(() => {
+                authModal.style.display = 'none';
+                registerEmail.value = '';
+                registerPassword.value = '';
+                registerConfirmPassword.value = '';
+                message.textContent = '';
+                switchToLogin();
+            }, 1500);
+        } catch (error) {
+            message.textContent = `❌ ${getAuthErrorMessage(error.code)}`;
+            message.style.color = 'var(--error)';
+        }
+    });
+    
+    // =========================================
+    // RESET PASSWORD
+    // =========================================
+    resetBtn.addEventListener('click', async () => {
+        const email = loginEmail.value.trim() || registerEmail.value.trim();
+        
+        if (!email) {
+            message.textContent = '⚠️ الرجاء إدخال البريد الإلكتروني لإعادة التعيين';
+            message.style.color = 'var(--error)';
+            return;
+        }
+        
+        try {
+            await sendPasswordResetEmail(auth, email);
+            message.textContent = '✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني';
+            message.style.color = 'var(--success)';
+        } catch (error) {
+            message.textContent = `❌ ${getAuthErrorMessage(error.code)}`;
+            message.style.color = 'var(--error)';
+        }
+    });
+    
+    // =========================================
+    // GOOGLE LOGIN
+    // =========================================
+    googleBtn.addEventListener('click', async () => {
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            message.textContent = `✅ مرحباً ${result.user.displayName || result.user.email}!`;
+            message.style.color = 'var(--success)';
+            setTimeout(() => {
+                authModal.style.display = 'none';
+                message.textContent = '';
+            }, 1000);
+        } catch (error) {
+            if (error.code === 'auth/popup-closed-by-user') {
+                message.textContent = '⚠️ تم إغلاق نافذة تسجيل الدخول';
+            } else {
+                message.textContent = `❌ ${getAuthErrorMessage(error.code)}`;
+            }
+            message.style.color = 'var(--error)';
+        }
+    });
+    
+    // =========================================
+    // ENTER KEY SUPPORT
+    // =========================================
+    loginPassword.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') loginBtn.click();
+    });
+    
+    registerConfirmPassword.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') registerBtn.click();
+    });
     
     return authModal;
-}
+    }
 
 // =============================================
 // 5. AUTH FUNCTIONS
