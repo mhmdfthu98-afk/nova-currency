@@ -8,7 +8,9 @@ import {
     sendPasswordResetEmail,
     onAuthStateChanged,
     GoogleAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { 
     getFirestore, 
@@ -28,7 +30,6 @@ import {
     Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// إعدادات Firebase من مشروعك
 const firebaseConfig = {
     apiKey: "AIzaSyAmiuvUSKY-UPL_oD7FOgQUOUh1-lRUANo",
     authDomain: "nova-currency-app.firebaseapp.com",
@@ -39,24 +40,23 @@ const firebaseConfig = {
     measurementId: "G-SR7RJTVKDN"
 };
 
-// تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// تصدير الخدمات
 export { 
     auth, 
     db, 
+    googleProvider,
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     signOut,
     sendPasswordResetEmail,
     onAuthStateChanged,
-    GoogleAuthProvider,
     signInWithPopup,
-    googleProvider,
+    signInWithRedirect,
+    getRedirectResult,
     collection, 
     doc, 
     getDoc, 
@@ -68,49 +68,6 @@ export {
     query, 
     where, 
     orderBy, 
-    onSnapshot,
-    serverTimestamp,
-    Timestamp
-    
-    // =============================================
-// ADS COLLECTIONS
-// =============================================
-
-// إضافة إلى exports الموجودة
-export {
-    // ... existing exports
-    // إضافة هذه
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    setDoc,
-    updateDoc,
-    deleteDoc,
-    addDoc,
-    query,
-    where,
-    orderBy,
-    onSnapshot,
-    serverTimestamp,
-    Timestamp
-
-// =============================================
-// ADDITIONAL EXPORTS FOR PRO
-// =============================================
-
-export {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    setDoc,
-    updateDoc,
-    deleteDoc,
-    addDoc,
-    query,
-    where,
-    orderBy,
     onSnapshot,
     serverTimestamp,
     Timestamp
