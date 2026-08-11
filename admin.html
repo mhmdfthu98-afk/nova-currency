@@ -821,6 +821,7 @@
             <a href="#" data-page="users"><span class="icon">👥</span> المستخدمين</a>
             <a href="#" data-page="settings"><span class="icon">⚙️</span> الإعدادات</a>
             <a href="#" data-page="ads"><span class="icon">📢</span> الإعلانات</a>
+            <a href="#" data-page="pro"><span class="icon">⭐</span> NOVA PRO</a>
         </nav>
         <div class="sidebar-footer">
             <button id="logoutBtn">🚪 تسجيل الخروج</button>
@@ -1069,6 +1070,67 @@
             </div>
         </section>
 
+        <!-- ==================== NOVA PRO MANAGEMENT ==================== -->
+        <section id="page-pro" class="page-section">
+            <h2>⭐ NOVA PRO</h2>
+            <p class="subtitle">إدارة الاشتراكات والمستخدمين المميزين</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👤</div>
+                    <div class="stat-number" id="proTotalUsers">0</div>
+                    <div class="stat-label">إجمالي مستخدمين Pro</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🟢</div>
+                    <div class="stat-number" id="proActiveUsers">0</div>
+                    <div class="stat-label">نشطون حالياً</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-number" id="proRevenue">N/A</div>
+                    <div class="stat-label">الإيرادات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔄</div>
+                    <div class="stat-number" id="proConversionRate">0%</div>
+                    <div class="stat-label">نسبة التحويل</div>
+                </div>
+            </div>
+
+            <!-- خطط الاشتراك -->
+            <div class="table-container" style="padding: 24px;">
+                <h3 style="margin-bottom: 16px;">📋 خطط NOVA PRO</h3>
+                <div id="plansContainer">
+                    <!-- يتم التحميل عبر JavaScript -->
+                </div>
+                <button id="addPlanBtn" class="btn btn-success" style="margin-top:12px; background:var(--success); color:white; border:none; padding:10px 24px; border-radius:12px; cursor:pointer;">
+                    ➕ إضافة خطة جديدة
+                </button>
+            </div>
+
+            <!-- مستخدمين Pro -->
+            <div class="table-container" style="padding:24px; margin-top:16px;">
+                <h3 style="margin-bottom:16px;">👥 مستخدمين NOVA PRO</h3>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المستخدم</th>
+                                <th>الخطة</th>
+                                <th>الحالة</th>
+                                <th>تاريخ البدء</th>
+                                <th>تاريخ الانتهاء</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proUsersList"></tbody>
+                    </table>
+                </div>
+                <div id="proUsersEmpty" class="empty-state"><div class="icon">📭</div><h3>لا يوجد مستخدمين Pro</h3></div>
+            </div>
+        </section>
+
     </div> <!-- end main-content -->
 
     <!-- ============================================
@@ -1142,6 +1204,87 @@
                     <button class="btn btn-secondary" id="confirmCancelBtn">إلغاء</button>
                     <button class="btn" id="confirmDeleteBtn" style="background: var(--error); color: white;">🗑️ حذف</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    MODAL - Add/Edit Plan
+    ============================================ -->
+    <div class="modal-overlay" id="planModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 id="planModalTitle">📋 إضافة خطة جديدة</h3>
+                <button class="modal-close" id="planModalClose">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="planForm">
+                    <input type="hidden" id="formPlanId">
+                    <div class="form-group">
+                        <label>اسم الخطة (عربي)</label>
+                        <input type="text" id="formPlanName" placeholder="مثال: شهري" required>
+                    </div>
+                    <div class="form-group">
+                        <label>اسم الخطة (إنجليزي)</label>
+                        <input type="text" id="formPlanNameEn" placeholder="مثال: Monthly">
+                    </div>
+                    <div class="form-group">
+                        <label>السعر</label>
+                        <input type="number" id="formPlanPrice" placeholder="مثال: 500" step="any" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>العملة</label>
+                        <select id="formPlanCurrency">
+                            <option value="SDG">SDG - جنيه سوداني</option>
+                            <option value="USD">USD - دولار أمريكي</option>
+                            <option value="EUR">EUR - يورو</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>فترة الفوترة</label>
+                        <select id="formPlanPeriod">
+                            <option value="monthly">شهري</option>
+                            <option value="yearly">سنوي</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المميزات</label>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                <input type="checkbox" class="plan-feature" value="remove_ads"> 🚫 إزالة الإعلانات
+                            </label>
+                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                <input type="checkbox" class="plan-feature" value="advanced_alerts"> 🔔 تنبيهات متقدمة
+                            </label>
+                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                <input type="checkbox" class="plan-feature" value="advanced_charts"> 📊 رسوم بيانية متقدمة
+                            </label>
+                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                <input type="checkbox" class="plan-feature" value="long_history"> 📅 تاريخ طويل
+                            </label>
+                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                <input type="checkbox" class="plan-feature" value="advanced_comparison"> ⚖️ مقارنات متقدمة
+                            </label>
+                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                <input type="checkbox" class="plan-feature" value="premium_themes"> 🎨 ثيمات مميزة
+                            </label>
+                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                <input type="checkbox" class="plan-feature" value="future_features"> 🚀 ميزات مستقبلية
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>الحالة</label>
+                        <select id="formPlanStatus">
+                            <option value="active">🟢 نشط</option>
+                            <option value="inactive">🔴 غير نشط</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="planCancelBtn">إلغاء</button>
+                        <button type="submit" class="btn btn-primary" id="planSubmitBtn">💾 حفظ</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1222,7 +1365,8 @@
             activity: document.getElementById('page-activity'),
             users: document.getElementById('page-users'),
             settings: document.getElementById('page-settings'),
-            ads: document.getElementById('page-ads')
+            ads: document.getElementById('page-ads'),
+            pro: document.getElementById('page-pro')
         };
 
         const statCurrencies = document.getElementById('statCurrencies');
@@ -1270,9 +1414,24 @@
         const confirmCancelBtn = document.getElementById('confirmCancelBtn');
         const confirmModalClose = document.getElementById('confirmModalClose');
 
+        // Plan Modal
+        const planModal = document.getElementById('planModal');
+        const planModalTitle = document.getElementById('planModalTitle');
+        const planModalClose = document.getElementById('planModalClose');
+        const formPlanId = document.getElementById('formPlanId');
+        const formPlanName = document.getElementById('formPlanName');
+        const formPlanNameEn = document.getElementById('formPlanNameEn');
+        const formPlanPrice = document.getElementById('formPlanPrice');
+        const formPlanCurrency = document.getElementById('formPlanCurrency');
+        const formPlanPeriod = document.getElementById('formPlanPeriod');
+        const formPlanStatus = document.getElementById('formPlanStatus');
+        const planCancelBtn = document.getElementById('planCancelBtn');
+        const planSubmitBtn = document.getElementById('planSubmitBtn');
+
         const toastContainer = document.getElementById('toastContainer');
         const addCurrencyBtn = document.getElementById('addCurrencyBtn');
         const refreshSettingsBtn = document.getElementById('refreshSettingsBtn');
+        const addPlanBtn = document.getElementById('addPlanBtn');
 
         // ============================================
         // 3. THEME
@@ -1327,6 +1486,7 @@
                 if (page === 'users') loadUsers();
                 if (page === 'dashboard') loadDashboardData();
                 if (page === 'ads') loadAdsSettings();
+                if (page === 'pro') loadProManagement();
             });
         });
 
@@ -1833,7 +1993,6 @@
                     }
                 }
 
-                // تحميل تحليلات الإعلانات
                 await loadAdsAnalytics();
             } catch (error) {
                 console.error('❌ Error loading ads settings:', error);
@@ -1849,16 +2008,13 @@
                 document.getElementById('adsImpressions').textContent = impressionsSnap.size || 0;
                 document.getElementById('adsRequests').textContent = requestsSnap.size || 0;
                 document.getElementById('adsFailures').textContent = failuresSnap.size || 0;
-
-                // Revenue - سيتم تحديثه عند ربط AdMob
                 document.getElementById('adsRevenue').textContent = 'N/A';
             } catch (error) {
                 console.error('❌ Error loading ads analytics:', error);
             }
         }
 
-        // حفظ إعدادات الإعلانات
-        async function saveAdsSettings(e) {
+        document.getElementById('adsSettingsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const settings = {
@@ -1887,10 +2043,9 @@
                 console.error('❌ Error saving ads settings:', error);
                 showToast('❌ حدث خطأ أثناء حفظ الإعدادات', 'error');
             }
-        }
+        });
 
-        // إعادة تعيين إعدادات الإعلانات
-        function resetAdsSettings() {
+        document.getElementById('resetAdsBtn').addEventListener('click', () => {
             if (confirm('هل أنت متأكد من إعادة تعيين إعدادات الإعلانات إلى القيم الافتراضية؟')) {
                 document.getElementById('adsEnabled').checked = false;
                 document.getElementById('bannerEnabled').checked = true;
@@ -1905,14 +2060,12 @@
                 document.getElementById('placementDetails').checked = true;
                 showToast('🔄 تم إعادة تعيين الإعدادات', 'info');
             }
-        }
+        });
 
-        // اختبار الإعلانات
         function testAd(type) {
             const resultEl = document.getElementById('testResult');
             resultEl.textContent = `⏳ جاري اختبار ${type}...`;
             resultEl.style.color = 'var(--info)';
-
             setTimeout(() => {
                 if (Math.random() > 0.2) {
                     resultEl.textContent = `✅ تم عرض ${type} بنجاح (Test Mode)`;
@@ -1924,8 +2077,366 @@
             }, 2000);
         }
 
+        document.getElementById('testBannerBtn').addEventListener('click', () => testAd('Banner'));
+        document.getElementById('testInterstitialBtn').addEventListener('click', () => testAd('Interstitial'));
+        document.getElementById('testRewardedBtn').addEventListener('click', () => testAd('Rewarded'));
+
         // ============================================
-        // 14. REALTIME LISTENERS
+        // 14. PRO MANAGEMENT
+        // ============================================
+        async function loadProManagement() {
+            try {
+                // تحميل إحصائيات Pro
+                const subsSnap = await getDocs(collection(db, 'subscriptions'));
+                const activeSubs = subsSnap.docs.filter(doc => {
+                    const data = doc.data();
+                    return data.status === 'active' || data.status === 'trial';
+                });
+
+                document.getElementById('proTotalUsers').textContent = subsSnap.size;
+                document.getElementById('proActiveUsers').textContent = activeSubs.length;
+
+                // تحميل الخطط
+                await loadPlans();
+
+                // تحميل مستخدمين Pro
+                await loadProUsers();
+
+            } catch (error) {
+                console.error('❌ Error loading Pro management:', error);
+                showToast('⚠️ حدث خطأ في تحميل بيانات Pro', 'error');
+            }
+        }
+
+        async function loadPlans() {
+            try {
+                const plansSnap = await getDocs(collection(db, 'plans'));
+                const container = document.getElementById('plansContainer');
+
+                if (plansSnap.empty) {
+                    container.innerHTML = `
+                        <div class="empty-state"><div class="icon">📭</div><h3>لا توجد خطط</h3></div>
+                    `;
+                    return;
+                }
+
+                let html = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px;">`;
+                plansSnap.forEach(doc => {
+                    const data = doc.data();
+                    const isActive = data.active !== false;
+                    const features = data.features || [];
+                    html += `
+                        <div style="background:var(--bg); padding:16px; border-radius:12px; border:2px solid ${isActive ? 'var(--success)' : 'var(--error)'};">
+                            <h4 style="font-weight:700;">${data.name || data.nameEn || 'خطة'}</h4>
+                            <div style="font-size:20px; font-weight:900; color:var(--primary);">
+                                ${data.price} ${data.currency || 'SDG'}
+                            </div>
+                            <div style="font-size:12px; color:var(--text-secondary);">
+                                ${data.billingPeriod === 'monthly' ? '📅 شهري' : '📅 سنوي'}
+                                <span style="color:${isActive ? 'var(--success)' : 'var(--error)'}; margin-right:8px;">
+                                    ${isActive ? '🟢 نشط' : '🔴 غير نشط'}
+                                </span>
+                            </div>
+                            <div style="font-size:12px; margin-top:4px; color:var(--text-secondary);">
+                                ${features.length} ميزة
+                            </div>
+                            <div style="margin-top:8px; display:flex; gap:8px;">
+                                <button class="edit-plan-btn" data-id="${doc.id}" style="padding:4px 12px; border:none; border-radius:8px; background:var(--primary); color:white; cursor:pointer; font-size:12px;">✏️ تعديل</button>
+                                <button class="delete-plan-btn" data-id="${doc.id}" style="padding:4px 12px; border:none; border-radius:8px; background:var(--error); color:white; cursor:pointer; font-size:12px;">🗑️ حذف</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+
+                // Events للخطة
+                document.querySelectorAll('.edit-plan-btn').forEach(btn => {
+                    btn.addEventListener('click', () => openEditPlan(btn.dataset.id));
+                });
+                document.querySelectorAll('.delete-plan-btn').forEach(btn => {
+                    btn.addEventListener('click', () => deletePlan(btn.dataset.id));
+                });
+
+            } catch (error) {
+                console.error('❌ Error loading plans:', error);
+            }
+        }
+
+        async function loadProUsers() {
+            try {
+                const subsSnap = await getDocs(collection(db, 'subscriptions'));
+                const tbody = document.getElementById('proUsersList');
+                const empty = document.getElementById('proUsersEmpty');
+
+                if (subsSnap.empty) {
+                    tbody.innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
+
+                empty.style.display = 'none';
+                let html = '';
+
+                for (const doc of subsSnap.docs) {
+                    const data = doc.data();
+                    const userId = doc.id;
+
+                    let userEmail = userId;
+                    try {
+                        const userRef = doc(db, 'users', userId);
+                        const userSnap = await getDoc(userRef);
+                        if (userSnap.exists()) {
+                            userEmail = userSnap.data().email || userId;
+                        }
+                    } catch (e) {}
+
+                    const statusMap = {
+                        'active': '🟢 نشط',
+                        'trial': '🟡 تجريبي',
+                        'expired': '🔴 منتهي',
+                        'cancelled': '⚫ ملغي',
+                        'free': '⚪ مجاني'
+                    };
+
+                    const startDate = data.startDate?.toDate?.() || new Date();
+                    const endDate = data.endDate?.toDate?.() || new Date();
+
+                    html += `
+                        <tr>
+                            <td>${userEmail}</td>
+                            <td>${data.planId || '—'}</td>
+                            <td>${statusMap[data.status] || data.status || '—'}</td>
+                            <td>${startDate.toLocaleDateString('ar')}</td>
+                            <td>${endDate.toLocaleDateString('ar')}</td>
+                            <td>
+                                <button class="grant-pro-btn" data-user="${userId}" style="padding:4px 12px; border:none; border-radius:8px; background:var(--success); color:white; cursor:pointer; font-size:12px;">
+                                    ✨ منح Pro
+                                </button>
+                                <button class="revoke-pro-btn" data-user="${userId}" style="padding:4px 12px; border:none; border-radius:8px; background:var(--error); color:white; cursor:pointer; font-size:12px;">
+                                    🚫 إلغاء
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                tbody.innerHTML = html;
+
+                // Events
+                document.querySelectorAll('.grant-pro-btn').forEach(btn => {
+                    btn.addEventListener('click', () => grantPro(btn.dataset.user));
+                });
+                document.querySelectorAll('.revoke-pro-btn').forEach(btn => {
+                    btn.addEventListener('click', () => revokePro(btn.dataset.user));
+                });
+
+            } catch (error) {
+                console.error('❌ Error loading Pro users:', error);
+            }
+        }
+
+        // ============================================
+        // 15. PLAN CRUD
+        // ============================================
+        function openPlanModal(planId = null) {
+            if (planId) {
+                planModalTitle.textContent = '✏️ تعديل الخطة';
+                planSubmitBtn.textContent = '💾 تحديث';
+                // تحميل بيانات الخطة
+                const plan = plansCache.find(p => p.id === planId);
+                if (plan) {
+                    formPlanId.value = planId;
+                    formPlanName.value = plan.name || '';
+                    formPlanNameEn.value = plan.nameEn || '';
+                    formPlanPrice.value = plan.price || '';
+                    formPlanCurrency.value = plan.currency || 'SDG';
+                    formPlanPeriod.value = plan.billingPeriod || 'monthly';
+                    formPlanStatus.value = plan.active !== false ? 'active' : 'inactive';
+                    // تحديد المميزات
+                    document.querySelectorAll('.plan-feature').forEach(cb => {
+                        cb.checked = plan.features?.includes(cb.value) || false;
+                    });
+                }
+            } else {
+                planModalTitle.textContent = '📋 إضافة خطة جديدة';
+                formPlanId.value = '';
+                formPlanName.value = '';
+                formPlanNameEn.value = '';
+                formPlanPrice.value = '';
+                formPlanCurrency.value = 'SDG';
+                formPlanPeriod.value = 'monthly';
+                formPlanStatus.value = 'active';
+                document.querySelectorAll('.plan-feature').forEach(cb => cb.checked = false);
+                planSubmitBtn.textContent = '💾 حفظ';
+            }
+            planModal.classList.add('active');
+        }
+
+        function closePlanModal() {
+            planModal.classList.remove('active');
+        }
+
+        addPlanBtn.addEventListener('click', () => openPlanModal());
+        planModalClose.addEventListener('click', closePlanModal);
+        planCancelBtn.addEventListener('click', closePlanModal);
+        planModal.addEventListener('click', (e) => {
+            if (e.target === planModal) closePlanModal();
+        });
+
+        document.getElementById('planForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = formPlanId.value;
+            const features = [];
+            document.querySelectorAll('.plan-feature:checked').forEach(cb => {
+                features.push(cb.value);
+            });
+
+            const data = {
+                name: formPlanName.value.trim(),
+                nameEn: formPlanNameEn.value.trim(),
+                price: parseFloat(formPlanPrice.value) || 0,
+                currency: formPlanCurrency.value,
+                billingPeriod: formPlanPeriod.value,
+                features: features,
+                active: formPlanStatus.value === 'active',
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                planSubmitBtn.disabled = true;
+                planSubmitBtn.textContent = '⏳ جاري الحفظ...';
+
+                if (id) {
+                    await updateDoc(doc(db, 'plans', id), data);
+                    await addActivityLog('UPDATE_PLAN', id, `تحديث خطة ${data.name}`);
+                    showToast(`✅ تم تحديث الخطة بنجاح`, 'success');
+                } else {
+                    const docRef = await addDoc(collection(db, 'plans'), {
+                        ...data,
+                        createdAt: serverTimestamp()
+                    });
+                    await addActivityLog('ADD_PLAN', docRef.id, `إضافة خطة ${data.name}`);
+                    showToast(`✅ تم إضافة الخطة بنجاح`, 'success');
+                }
+
+                closePlanModal();
+                loadPlans();
+                loadDashboardData();
+            } catch (error) {
+                console.error('❌ Error saving plan:', error);
+                showToast('❌ حدث خطأ أثناء الحفظ', 'error');
+            } finally {
+                planSubmitBtn.disabled = false;
+                planSubmitBtn.textContent = id ? '💾 تحديث' : '💾 حفظ';
+            }
+        });
+
+        let plansCache = [];
+
+        async function openEditPlan(id) {
+            try {
+                const planRef = doc(db, 'plans', id);
+                const planSnap = await getDoc(planRef);
+                if (planSnap.exists()) {
+                    plansCache.push({ id: planSnap.id, ...planSnap.data() });
+                    openPlanModal(id);
+                }
+            } catch (error) {
+                console.error('❌ Error loading plan:', error);
+                showToast('⚠️ حدث خطأ في تحميل الخطة', 'error');
+            }
+        }
+
+        async function deletePlan(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الخطة؟')) {
+                try {
+                    await deleteDoc(doc(db, 'plans', id));
+                    await addActivityLog('DELETE_PLAN', id, 'حذف خطة');
+                    showToast('🗑️ تم حذف الخطة بنجاح', 'success');
+                    loadPlans();
+                } catch (error) {
+                    console.error('❌ Error deleting plan:', error);
+                    showToast('❌ حدث خطأ أثناء الحذف', 'error');
+                }
+            }
+        }
+
+        // ============================================
+        // 16. GRANT / REVOKE PRO
+        // ============================================
+        async function grantPro(userId) {
+            const days = prompt('عدد أيام الاشتراك:', '30');
+            if (!days || isNaN(days) || parseInt(days) <= 0) return;
+
+            const planId = prompt('معرف الخطة (monthly/yearly):', 'monthly');
+            if (!planId) return;
+
+            try {
+                // التحقق من وجود الخطة
+                const planRef = doc(db, 'plans', planId);
+                const planSnap = await getDoc(planRef);
+                if (!planSnap.exists()) {
+                    showToast('⚠️ الخطة غير موجودة', 'error');
+                    return;
+                }
+
+                const plan = planSnap.data();
+                const startDate = new Date();
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + parseInt(days));
+
+                const subRef = doc(db, 'subscriptions', userId);
+                await setDoc(subRef, {
+                    userId: userId,
+                    planId: planId,
+                    status: 'active',
+                    startDate: serverTimestamp(),
+                    endDate: endDate,
+                    autoRenew: false,
+                    provider: 'admin',
+                    features: plan.features || [],
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    grantReason: 'Admin grant',
+                    grantedBy: ADMIN_EMAIL
+                });
+
+                await addActivityLog('GRANT_PRO', userId, `منح Pro لمستخدم ${userId} - ${days} يوم`);
+                showToast(`✅ تم منح Pro للمستخدم بنجاح`, 'success');
+                loadProUsers();
+                loadProManagement();
+            } catch (error) {
+                console.error('❌ Error granting Pro:', error);
+                showToast('❌ حدث خطأ أثناء منح Pro', 'error');
+            }
+        }
+
+        async function revokePro(userId) {
+            if (!confirm(`هل أنت متأكد من إلغاء Pro للمستخدم ${userId}؟`)) return;
+
+            try {
+                const subRef = doc(db, 'subscriptions', userId);
+                await updateDoc(subRef, {
+                    status: 'expired',
+                    updatedAt: serverTimestamp(),
+                    revokeReason: 'Admin revoke',
+                    revokedBy: ADMIN_EMAIL
+                });
+
+                await addActivityLog('REVOKE_PRO', userId, `إلغاء Pro لمستخدم ${userId}`);
+                showToast(`✅ تم إلغاء Pro بنجاح`, 'success');
+                loadProUsers();
+                loadProManagement();
+            } catch (error) {
+                console.error('❌ Error revoking Pro:', error);
+                showToast('❌ حدث خطأ أثناء إلغاء Pro', 'error');
+            }
+        }
+
+        // ============================================
+        // 17. REALTIME LISTENERS
         // ============================================
         function startRealtimeListeners() {
             if (window.unsubscribeCurrencies) window.unsubscribeCurrencies();
@@ -1966,16 +2477,7 @@
         }
 
         // ============================================
-        // 15. EVENTS
-        // ============================================
-        document.getElementById('adsSettingsForm').addEventListener('submit', saveAdsSettings);
-        document.getElementById('resetAdsBtn').addEventListener('click', resetAdsSettings);
-        document.getElementById('testBannerBtn').addEventListener('click', () => testAd('Banner'));
-        document.getElementById('testInterstitialBtn').addEventListener('click', () => testAd('Interstitial'));
-        document.getElementById('testRewardedBtn').addEventListener('click', () => testAd('Rewarded'));
-
-        // ============================================
-        // 16. INIT
+        // 18. INIT
         // ============================================
         console.log('🚀 NOVA Currency Admin Panel جاهز!');
         console.log(`👤 المدير: ${ADMIN_EMAIL}`);
@@ -1989,8 +2491,11 @@
             loadUsers,
             loadSettings,
             loadAdsSettings,
+            loadProManagement,
             addActivityLog,
-            showToast
+            showToast,
+            grantPro,
+            revokePro
         };
     </script>
 </body>
