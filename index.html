@@ -1036,8 +1036,7 @@
     <!-- ============================
     JAVASCRIPT
     ============================ -->
-             
-        <script type="module">
+             <script type="module">
 // =============================================
 // IMPORTS
 // =============================================
@@ -1079,6 +1078,7 @@ let favorites = JSON.parse(localStorage.getItem('nova_favorites') || '[]');
 let currentFilter = 'all';
 let searchQuery = '';
 let unsubscribeCurrencies = null;
+let conversionHistory = JSON.parse(localStorage.getItem('nova_conversion_history') || '[]');
 
 // =============================================
 // 2. DOM REFS
@@ -1107,6 +1107,7 @@ const converterMarket = document.getElementById('converterMarket');
 const swapBtn = document.getElementById('swapCurrencies');
 const convertedAmount = document.getElementById('convertedAmount');
 const convertedDetail = document.getElementById('convertedDetail');
+const rateDisplay = document.getElementById('rateDisplay');
 
 // =============================================
 // 3. TOAST
@@ -1600,17 +1601,16 @@ async function loadCurrenciesFromFirestore() {
                 name: data.nameAr || data.name || doc.id,
                 flag: data.flag || '🏳️',
                 country: data.country || '',
-                // السعر الرسمي من الحقول المباشرة
                 official: { 
                     buy: data.officialBuy || 0, 
                     sell: data.officialSell || 0 
                 },
-                // السوق الموازي من الحقول المباشرة
                 parallel: { 
                     buy: data.parallelBuy || 0, 
                     sell: data.parallelSell || 0 
                 },
                 change: data.changePercent || 0,
+                decimalDigits: data.decimalDigits || 2,
                 updatedAt: data.updatedAt ? 
                     new Date(data.updatedAt.toDate()).toLocaleString('ar') : 
                     new Date().toLocaleString('ar'),
@@ -1623,6 +1623,9 @@ async function loadCurrenciesFromFirestore() {
         renderCurrencies();
         renderConverterOptions();
         updateCurrencyCount();
+        setupQuickAmounts();
+        setupQuickCurrencies();
+        renderConversionHistory();
         if (currenciesData.length > 0) {
             showToast(`✅ تم تحميل ${currenciesData.length} عملة`, 'success');
         }
@@ -1665,6 +1668,7 @@ function setupRealtimeListener() {
                         sell: data.parallelSell || 0 
                     },
                     change: data.changePercent || 0,
+                    decimalDigits: data.decimalDigits || 2,
                     updatedAt: data.updatedAt ? 
                         new Date(data.updatedAt.toDate()).toLocaleString('ar') : 
                         new Date().toLocaleString('ar'),
@@ -1676,6 +1680,8 @@ function setupRealtimeListener() {
             renderCurrencies();
             renderConverterOptions();
             updateCurrencyCount();
+            setupQuickAmounts();
+            setupQuickCurrencies();
         }
     }, (error) => {
         console.error('❌ خطأ في الاستماع للتغييرات:', error);
@@ -1736,20 +1742,20 @@ function renderCurrencies() {
         const isFavorite = favorites.includes(currency.id);
         const changeClass = currency.change >= 0 ? 'positive' : 'negative';
         const changeIcon = currency.change >= 0 ? '↑' : '↓';
-        
-        // استخدام السوق الرسمي لعرض الشراء والبيع
         const buyPrice = currency.official?.buy ?? 0;
         const sellPrice = currency.official?.sell ?? 0;
+        const isBase = currency.code === 'SDG';
         
         return `
-            <div class="currency-card" data-id="${currency.id}">
+            <div class="currency-card ${isBase ? 'base-currency' : ''}" data-id="${currency.id}" style="${isBase ? 'border-color: var(--primary); border-width: 2px;' : ''}">
                 <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${currency.id}">
                     ${isFavorite ? '⭐' : '☆'}
                 </button>
+                ${isBase ? '<div style="position:absolute; top:16px; right:16px; background:var(--primary); color:white; padding:2px 10px; border-radius:20px; font-size:10px; font-weight:700;">🇸🇩 الأساسية</div>' : ''}
                 <div class="top-row">
                     <span class="flag">${currency.flag || '🏳️'}</span>
                     <div class="info">
-                        <div class="name">${currency.name || currency.code}</div>
+                        <div class="name">${currency.name || currency.code} ${isBase ? '⭐' : ''}</div>
                         <div class="code">${currency.code} · ${currency.country || ''}</div>
                     </div>
                 </div>
@@ -1849,8 +1855,12 @@ function openModal(currency) {
     const officialSell = currency.official?.sell ?? 0;
     const parallelBuy = currency.parallel?.buy ?? 0;
     const parallelSell = currency.parallel?.sell ?? 0;
+    const isBase = currency.code === 'SDG';
     
     modalBody.innerHTML = `
+        <div style="margin-bottom:16px; ${isBase ? 'background:var(--primary);color:white;padding:8px 16px;border-radius:10px;text-align:center;' : ''}">
+            ${isBase ? '⭐ العملة الأساسية للتطبيق' : ''}
+        </div>
         <div class="detail-row">
             <span class="label">🌍 البلد</span>
             <span class="value">${currency.country || '—'}</span>
@@ -1891,6 +1901,7 @@ function openModal(currency) {
             <button class="btn btn-primary" onclick="document.getElementById('converter').scrollIntoView({behavior:'smooth'})">
                 🔄 تحويل العملة
             </button>
+            ${isBase ? '' : `<button class="btn btn-secondary" onclick="setConverterTo('${currency.id}')" style="margin-right:8px;">🎯 تعيين كهدف</button>`}
         </div>
     `;
     
@@ -1909,28 +1920,49 @@ modal.addEventListener('click', (e) => {
 });
 
 // =============================================
-// 18. CONVERTER
+// 18. CONVERTER - RENDER OPTIONS (SDG PINNED)
 // =============================================
 function renderConverterOptions() {
     const activeCurrencies = currenciesData.filter(c => c.active !== false);
     
-    const options = activeCurrencies.map(c =>
-        `<option value="${c.id}">${c.flag || ''} ${c.code}</option>`
+    // SDG في الأعلى دائماً
+    const sortedCurrencies = [...activeCurrencies].sort((a, b) => {
+        if (a.code === 'SDG') return -1;
+        if (b.code === 'SDG') return 1;
+        return (a.name || '').localeCompare(b.name || '');
+    });
+    
+    const options = sortedCurrencies.map(c =>
+        `<option value="${c.id}" ${c.code === 'SDG' ? 'data-base="true"' : ''}>
+            ${c.flag || ''} ${c.code} - ${c.name || ''}
+        </option>`
     ).join('');
     
     converterFrom.innerHTML = options;
     converterTo.innerHTML = options;
     
-    if (activeCurrencies.length > 0) {
-        if (!converterFrom.value || !activeCurrencies.find(c => c.id === converterFrom.value)) {
-            converterFrom.value = activeCurrencies[0].id;
-        }
-        if (!converterTo.value || !activeCurrencies.find(c => c.id === converterTo.value)) {
-            converterTo.value = activeCurrencies.length > 1 ? activeCurrencies[1].id : activeCurrencies[0].id;
-        }
+    // تعيين SDG كمصدر و USD كهدف افتراضي
+    const sdgCurrency = sortedCurrencies.find(c => c.code === 'SDG');
+    const usdCurrency = sortedCurrencies.find(c => c.code === 'USD');
+    const defaultTarget = usdCurrency || (sortedCurrencies.length > 1 ? sortedCurrencies[1] : sortedCurrencies[0]);
+    
+    if (sdgCurrency) {
+        converterFrom.value = sdgCurrency.id;
     }
+    if (defaultTarget && defaultTarget.id !== converterFrom.value) {
+        converterTo.value = defaultTarget.id;
+    } else if (sortedCurrencies.length > 1) {
+        converterTo.value = sortedCurrencies[1].id;
+    }
+    
+    // تحديث التسميات
+    updateConverterLabels();
+    convertCurrency();
 }
 
+// =============================================
+// 19. CONVERTER - CONVERT CURRENCY
+// =============================================
 function convertCurrency() {
     const fromId = converterFrom.value;
     const toId = converterTo.value;
@@ -1944,43 +1976,358 @@ function convertCurrency() {
     if (!fromCurrency || !toCurrency) {
         convertedAmount.textContent = '0.00';
         convertedDetail.textContent = '⚠️ عملة غير متوفرة';
+        updateRateDisplay(null, null, null, null, null);
         return;
     }
     
-    // الحصول على السعر حسب السوق (رسمي أو موازي) ونوع السعر (شراء أو بيع)
-    const fromRate = fromCurrency[market]?.[priceType] || 0;
-    const toRate = toCurrency[market]?.[priceType] || 0;
+    // الحصول على الأسعار
+    function getPrice(currency) {
+        if (priceType === 'mid') {
+            const buy = currency[market]?.buy || 0;
+            const sell = currency[market]?.sell || 0;
+            return (buy + sell) / 2;
+        } else if (priceType === 'buy') {
+            return currency[market]?.buy || 0;
+        } else if (priceType === 'sell') {
+            return currency[market]?.sell || 0;
+        }
+        return 0;
+    }
     
-    if (fromRate === 0 || toRate === 0) {
+    const fromRate = getPrice(fromCurrency);
+    const toRate = getPrice(toCurrency);
+    
+    if (fromRate <= 0 || toRate <= 0) {
         convertedAmount.textContent = '0.00';
-        convertedDetail.textContent = '⚠️ السعر غير متوفر';
+        const marketName = market === 'official' ? 'رسمي' : 'موازي';
+        const priceName = priceType === 'buy' ? 'شراء' : priceType === 'sell' ? 'بيع' : 'متوسط';
+        convertedDetail.textContent = `⚠️ السعر غير متوفر (${priceName} - ${marketName})`;
+        updateRateDisplay(null, null, fromCurrency, toCurrency, null);
         return;
     }
     
-    const result = (amount / fromRate) * toRate;
-    convertedAmount.textContent = result.toFixed(2);
+    // حساب النتيجة
+    let result = 0;
+    let rateDisplayValue = 0;
+    let rateDirection = '';
     
+    if (fromCurrency.code === 'SDG') {
+        // من SDG إلى عملة أخرى
+        result = amount / toRate;
+        rateDisplayValue = toRate;
+        rateDirection = `1 ${toCurrency.code} = ${formatNumber(1 / toRate, 2)} SDG`;
+    } else if (toCurrency.code === 'SDG') {
+        // من عملة أخرى إلى SDG
+        result = amount * fromRate;
+        rateDisplayValue = fromRate;
+        rateDirection = `1 ${fromCurrency.code} = ${formatNumber(fromRate, 2)} SDG`;
+    } else {
+        // بين عملتين غير SDG
+        result = (amount * fromRate) / toRate;
+        rateDisplayValue = toRate;
+        rateDirection = `1 ${toCurrency.code} = ${formatNumber(1 / toRate, 2)} SDG (عبر SDG)`;
+    }
+    
+    // تنسيق النتيجة
+    const decimals = toCurrency.decimalDigits || 2;
+    const formattedResult = formatNumber(result, decimals);
+    convertedAmount.textContent = formattedResult;
+    
+    // تحديث التفاصيل
     const marketName = market === 'official' ? 'رسمي' : 'موازي';
-    const priceName = priceType === 'buy' ? 'شراء' : 'بيع';
-    convertedDetail.textContent = `${toCurrency.code} (${priceName} - ${marketName})`;
+    const priceName = priceType === 'buy' ? 'شراء' : priceType === 'sell' ? 'بيع' : 'متوسط';
+    const fromCode = fromCurrency.code;
+    const toCode = toCurrency.code;
+    const rateInfo = `1 ${fromCode} = ${formatNumber(rateDisplayValue, 2)} ${toCode}`;
+    
+    const updatedAt = fromCurrency.updatedAt || toCurrency.updatedAt || new Date().toLocaleString('ar');
+    convertedDetail.innerHTML = `
+        ${toCode} (${priceName} - ${marketName})
+        <br>
+        <span style="font-size:12px; opacity:0.7;">
+            ${rateInfo} · آخر تحديث: ${updatedAt}
+        </span>
+    `;
+    
+    // تحديث سعر الصرف
+    updateRateDisplay(rateDisplayValue, rateDirection, fromCurrency, toCurrency, updatedAt);
+    
+    // حفظ التحويل
+    saveConversionHistory(fromCurrency.code, toCurrency.code, amount, result);
 }
 
+// =============================================
+// 20. FORMAT NUMBER
+// =============================================
+function formatNumber(num, decimals = 2) {
+    if (num === undefined || num === null || isNaN(num) || !isFinite(num)) {
+        return '0.00';
+    }
+    return Number(num.toFixed(decimals)).toLocaleString('ar-EG', {
+        minimumFractionDigits: Math.min(decimals, 2),
+        maximumFractionDigits: Math.min(decimals, 4)
+    });
+}
+
+// =============================================
+// 21. UPDATE RATE DISPLAY
+// =============================================
+function updateRateDisplay(rate, direction, fromCurrency, toCurrency, updatedAt) {
+    if (!rateDisplay) return;
+    
+    if (rate === null || rate === undefined) {
+        rateDisplay.innerHTML = `
+            <span style="color: var(--text-secondary);">⚠️ سعر الصرف غير متاح</span>
+        `;
+        return;
+    }
+    
+    const fromCode = fromCurrency?.code || '?';
+    const toCode = toCurrency?.code || '?';
+    const market = converterMarket.value === 'official' ? 'رسمي' : 'موازي';
+    const priceType = converterPriceType.value === 'buy' ? 'شراء' : 
+                     converterPriceType.value === 'sell' ? 'بيع' : 'متوسط';
+    
+    rateDisplay.innerHTML = `
+        <div style="font-size:14px; font-weight:600; color: var(--primary);">
+            ${direction || `1 ${fromCode} = ${formatNumber(rate, 2)} ${toCode}`}
+        </div>
+        <div style="font-size:12px; color: var(--text-secondary); margin-top:4px;">
+            نوع السعر: ${priceType} · السوق: ${market}
+            ${updatedAt ? `· آخر تحديث: ${updatedAt}` : ''}
+        </div>
+    `;
+}
+
+// =============================================
+// 22. UPDATE CONVERTER LABELS
+// =============================================
+function updateConverterLabels() {
+    const fromCurrency = currenciesData.find(c => c.id === converterFrom.value);
+    const toCurrency = currenciesData.find(c => c.id === converterTo.value);
+    
+    if (fromCurrency && toCurrency) {
+        const fromLabel = document.querySelector('[for="converterFrom"]');
+        const toLabel = document.querySelector('[for="converterTo"]');
+        if (fromLabel) fromLabel.textContent = `من (${fromCurrency.code})`;
+        if (toLabel) toLabel.textContent = `إلى (${toCurrency.code})`;
+    }
+}
+
+// =============================================
+// 23. CONVERTER EVENTS
+// =============================================
 converterAmount.addEventListener('input', convertCurrency);
-converterFrom.addEventListener('change', convertCurrency);
-converterTo.addEventListener('change', convertCurrency);
+converterFrom.addEventListener('change', () => {
+    updateConverterLabels();
+    convertCurrency();
+});
+converterTo.addEventListener('change', () => {
+    updateConverterLabels();
+    convertCurrency();
+});
 converterPriceType.addEventListener('change', convertCurrency);
 converterMarket.addEventListener('change', convertCurrency);
 
+// =============================================
+// 24. SWAP BUTTON
+// =============================================
 swapBtn.addEventListener('click', () => {
     const temp = converterFrom.value;
     converterFrom.value = converterTo.value;
     converterTo.value = temp;
+    
+    // Animation
+    swapBtn.style.transform = 'rotate(180deg)';
+    setTimeout(() => {
+        swapBtn.style.transform = 'rotate(0deg)';
+    }, 300);
+    
+    updateConverterLabels();
     convertCurrency();
     showToast('🔄 تم تبديل العملات', 'info');
 });
 
 // =============================================
-// 19. MOBILE MENU
+// 25. QUICK AMOUNTS
+// =============================================
+function setupQuickAmounts() {
+    const container = document.getElementById('quickAmounts');
+    if (!container) return;
+    
+    const amounts = [100, 500, 1000, 5000, 10000, 50000, 100000];
+    
+    container.innerHTML = amounts.map(amount => `
+        <button class="quick-amount-btn" data-amount="${amount}" 
+                style="padding:6px 12px; border:2px solid var(--bg); border-radius:8px; 
+                       background:var(--card-bg); color:var(--text); cursor:pointer; 
+                       font-size:13px; transition:var(--transition);">
+            ${formatNumber(amount, 0)} SDG
+        </button>
+    `).join('');
+    
+    container.querySelectorAll('.quick-amount-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const amount = parseInt(btn.dataset.amount);
+            converterAmount.value = amount;
+            convertCurrency();
+            btn.style.background = 'var(--primary)';
+            btn.style.color = 'white';
+            setTimeout(() => {
+                btn.style.background = 'var(--card-bg)';
+                btn.style.color = 'var(--text)';
+            }, 300);
+        });
+    });
+}
+
+// =============================================
+// 26. QUICK CURRENCIES
+// =============================================
+function setupQuickCurrencies() {
+    const container = document.getElementById('quickCurrencies');
+    if (!container) return;
+    
+    const currencies = ['USD', 'EUR', 'SAR', 'AED', 'EGP', 'GBP', 'ETB'];
+    
+    container.innerHTML = currencies.map(code => `
+        <button class="quick-currency-btn" data-code="${code}"
+                style="padding:6px 14px; border:2px solid var(--bg); border-radius:8px; 
+                       background:var(--card-bg); color:var(--text); cursor:pointer; 
+                       font-size:13px; transition:var(--transition);">
+            ${code}
+        </button>
+    `).join('');
+    
+    container.querySelectorAll('.quick-currency-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const code = btn.dataset.code;
+            const currency = currenciesData.find(c => c.code === code);
+            if (currency) {
+                converterTo.value = currency.id;
+                convertCurrency();
+                btn.style.background = 'var(--secondary)';
+                btn.style.color = 'white';
+                setTimeout(() => {
+                    btn.style.background = 'var(--card-bg)';
+                    btn.style.color = 'var(--text)';
+                }, 300);
+                showToast(`🔄 تحويل إلى ${code}`, 'info');
+            }
+        });
+    });
+}
+
+// =============================================
+// 27. SET CONVERTER TO (من الـ Modal)
+// =============================================
+window.setConverterTo = function(id) {
+    const currency = currenciesData.find(c => c.id === id);
+    if (currency) {
+        converterTo.value = id;
+        convertCurrency();
+        closeModal();
+        document.getElementById('converter').scrollIntoView({ behavior: 'smooth' });
+        showToast(`🎯 تم تعيين الهدف إلى ${currency.code}`, 'success');
+    }
+};
+
+// =============================================
+// 28. CONVERSION HISTORY
+// =============================================
+function saveConversionHistory(fromCode, toCode, amount, result) {
+    const entry = {
+        from: fromCode,
+        to: toCode,
+        amount: amount,
+        result: result,
+        timestamp: new Date().toISOString()
+    };
+    
+    conversionHistory.unshift(entry);
+    if (conversionHistory.length > 20) {
+        conversionHistory = conversionHistory.slice(0, 20);
+    }
+    localStorage.setItem('nova_conversion_history', JSON.stringify(conversionHistory));
+    renderConversionHistory();
+}
+
+function renderConversionHistory() {
+    const container = document.getElementById('conversionHistory');
+    if (!container) return;
+    
+    if (conversionHistory.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center; padding:20px; color:var(--text-secondary); font-size:14px;">
+                📭 لا توجد تحويلات سابقة
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = conversionHistory.slice(0, 5).map(entry => {
+        const date = new Date(entry.timestamp);
+        const timeStr = date.toLocaleString('ar');
+        const formattedAmount = formatNumber(entry.amount, 0);
+        const formattedResult = formatNumber(entry.result, 2);
+        return `
+            <div style="display:flex; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--bg); font-size:13px;">
+                <span>
+                    <strong>${formattedAmount} ${entry.from}</strong> → 
+                    <strong>${formattedResult} ${entry.to}</strong>
+                </span>
+                <span style="color:var(--text-secondary); font-size:11px;">${timeStr}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// =============================================
+// 29. CLEAR HISTORY
+// =============================================
+function clearConversionHistory() {
+    if (confirm('هل أنت متأكد من مسح سجل التحويلات؟')) {
+        conversionHistory = [];
+        localStorage.setItem('nova_conversion_history', JSON.stringify(conversionHistory));
+        renderConversionHistory();
+        showToast('🗑️ تم مسح السجل', 'info');
+    }
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'clearHistoryBtn' || e.target.closest('#clearHistoryBtn')) {
+        clearConversionHistory();
+    }
+});
+
+// =============================================
+// 30. COPY RESULT
+// =============================================
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'copyResultBtn' || e.target.closest('#copyResultBtn')) {
+        const amount = converterAmount.value || '0';
+        const from = currenciesData.find(c => c.id === converterFrom.value)?.code || '?';
+        const to = currenciesData.find(c => c.id === converterTo.value)?.code || '?';
+        const result = convertedAmount.textContent || '0';
+        
+        const text = `${formatNumber(parseFloat(amount) || 0, 0)} ${from} ≈ ${result} ${to}`;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('📋 تم نسخ النتيجة', 'success');
+        }).catch(() => {
+            // Fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('📋 تم نسخ النتيجة', 'success');
+        });
+    }
+});
+
+// =============================================
+// 31. MOBILE MENU
 // =============================================
 hamburger.addEventListener('click', () => {
     mainNav.classList.toggle('open');
@@ -1995,7 +2342,7 @@ mainNav.querySelectorAll('a').forEach(link => {
 });
 
 // =============================================
-// 20. LOGIN BUTTON
+// 32. LOGIN BUTTON
 // =============================================
 loginBtn.addEventListener('click', () => {
     const authModal = document.getElementById('authModal');
@@ -2008,7 +2355,7 @@ loginBtn.addEventListener('click', () => {
 });
 
 // =============================================
-// 21. AUTH STATE
+// 33. AUTH STATE
 // =============================================
 onAuthStateChanged(auth, (user) => {
     updateAuthUI(user);
@@ -2016,7 +2363,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // =============================================
-// 22. ADMIN PANEL BUTTON
+// 34. ADMIN PANEL BUTTON
 // =============================================
 document.addEventListener('click', (e) => {
     if (e.target.id === 'adminPanelBtn' || e.target.closest('#adminPanelBtn')) {
@@ -2025,7 +2372,7 @@ document.addEventListener('click', (e) => {
 });
 
 // =============================================
-// 23. INIT
+// 35. INIT
 // =============================================
 await handleRedirectResult();
 
@@ -2037,10 +2384,16 @@ setupRealtimeListener();
 
 renderConverterOptions();
 
+// تهيئة الأقسام الإضافية
+setupQuickAmounts();
+setupQuickCurrencies();
+renderConversionHistory();
+
 console.log('🚀 NOVA RATE جاهز مع Firebase!');
 console.log(`📊 ${currenciesData.filter(c => c.active !== false).length} عملة متاحة`);
 console.log(`⭐ ${favorites.length} عملة في المفضلة`);
 console.log(`👤 المستخدم: ${currentUser ? currentUser.email : 'غير مسجل'}`);
+console.log('💱 العملة الأساسية: SDG (الجنيه السوداني)');
 
 window.__nova = {
     currencies: currenciesData,
@@ -2049,7 +2402,9 @@ window.__nova = {
     renderCurrencies,
     auth,
     db,
-    currentUser
+    currentUser,
+    convertCurrency,
+    formatNumber
 };
 </script>
 
