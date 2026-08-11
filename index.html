@@ -583,6 +583,49 @@
         .pro-dashboard .pro-actions .btn-secondary { background: var(--bg); color: var(--text); }
 
         /* ============================
+           PAYMENT MODAL - Google Play Style
+           ============================ */
+        #paymentModal .modal {
+            animation: modalSlideIn 0.3s ease;
+            max-width: 440px;
+        }
+        #paymentModal .plan-select-btn { transition: var(--transition); }
+        #paymentModal .plan-select-btn:hover { transform: scale(1.02); }
+        #paymentModal .payment-method-btn { transition: var(--transition); }
+        #paymentModal .payment-method-btn:hover { transform: scale(1.03); }
+        #paymentModal .payment-method-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+        #paymentModal input:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(20, 123, 255, 0.15);
+        }
+        #paymentModal .form-group { margin-bottom: 0; }
+        #paymentModal input[type="text"] {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+        #paymentModal input[type="password"] {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        #paymentModal input::placeholder {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            letter-spacing: 0;
+            font-size: 13px;
+            color: #999;
+        }
+
+        @media (max-width: 480px) {
+            #paymentModal .modal { margin: 8px; border-radius: 20px; }
+            #paymentModal .payment-method-btn { padding: 10px 8px; font-size: 11px; }
+            #paymentModal .payment-method-btn span:first-child { font-size: 22px; }
+            #paymentModal .plan-select-btn { padding: 10px; font-size: 13px; }
+        }
+
+        /* ============================
            MODAL
            ============================ */
         .modal-overlay {
@@ -937,6 +980,196 @@
     </div>
 
     <!-- ============================
+    MODAL - PAYMENT (Google Play Style)
+    ============================ -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal" style="max-width: 440px; padding: 0; overflow: hidden; border-radius: 28px; animation: modalSlideIn 0.3s ease; background: var(--card-bg);">
+            
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #1A237E, #0D47A1); padding: 28px 24px 20px; color: white; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: -30px; left: -30px; width: 80px; height: 80px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
+                <div style="display: flex; align-items: center; gap: 12px; position: relative;">
+                    <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.15); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; backdrop-filter: blur(10px);">
+                        ⭐
+                    </div>
+                    <div>
+                        <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">NOVA PRO</div>
+                        <div style="font-size: 12px; opacity: 0.8;">اشتراك مميز · بدون إعلانات</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 20px 24px 16px;">
+                
+                <!-- Plan Selection -->
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; background: var(--bg); padding: 4px; border-radius: 14px;">
+                    <button class="plan-select-btn active" data-plan="monthly" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: var(--primary); color: white; cursor: pointer; font-weight: 700; transition: var(--transition); font-size: 14px;">
+                        <div>شهري</div>
+                        <div style="font-size: 12px; font-weight: 400; opacity: 0.9;" id="monthlyPriceDisplay">500 SDG</div>
+                    </button>
+                    <button class="plan-select-btn" data-plan="yearly" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: transparent; color: var(--text-secondary); cursor: pointer; font-weight: 600; transition: var(--transition); font-size: 14px;">
+                        <div>سنوي</div>
+                        <div style="font-size: 12px; font-weight: 400;" id="yearlyPriceDisplay">4,500 SDG</div>
+                        <div style="font-size: 10px; color: var(--success);">وفر 25%</div>
+                    </button>
+                </div>
+
+                <!-- Payment Methods -->
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight: 600; font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 8px;">💳 طريقة الدفع</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button class="payment-method-btn active" data-method="mycashy" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; border: 2px solid var(--primary); border-radius: 14px; background: var(--primary); color: white; cursor: pointer; transition: var(--transition);">
+                            <span style="font-size: 28px;">📱</span>
+                            <span style="font-weight: 700; font-size: 12px;">ماي كاشي</span>
+                            <span style="font-size: 9px; opacity: 0.8;">MyCashy</span>
+                        </button>
+                        <button class="payment-method-btn" data-method="bankak" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; border: 2px solid var(--bg); border-radius: 14px; background: var(--bg); color: var(--text); cursor: pointer; transition: var(--transition);">
+                            <span style="font-size: 28px;">🏦</span>
+                            <span style="font-weight: 700; font-size: 12px;">Bankak</span>
+                            <span style="font-size: 9px; color: var(--text-secondary);">بنكك</span>
+                        </button>
+                        <button class="payment-method-btn" data-method="visa" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; border: 2px solid var(--bg); border-radius: 14px; background: var(--bg); color: var(--text); cursor: pointer; transition: var(--transition);">
+                            <span style="font-size: 28px;">💳</span>
+                            <span style="font-weight: 700; font-size: 12px;">فيزا كارد</span>
+                            <span style="font-size: 9px; color: var(--text-secondary);">بطاقة ائتمان</span>
+                        </button>
+                        <button class="payment-method-btn" data-method="atm" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; border: 2px solid var(--bg); border-radius: 14px; background: var(--bg); color: var(--text); cursor: pointer; transition: var(--transition);">
+                            <span style="font-size: 28px;">🏧</span>
+                            <span style="font-weight: 700; font-size: 12px;">صراف آلي</span>
+                            <span style="font-size: 9px; color: var(--text-secondary);">بطاقة صراف</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <div id="paymentFormContainer" style="background: var(--bg); padding: 16px; border-radius: 14px; margin-bottom: 14px;">
+                    
+                    <!-- MyCashy Form -->
+                    <div id="mycashyForm">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #E8F5E9; padding: 8px 12px; border-radius: 10px;">
+                            <span style="font-size: 16px;">📱</span>
+                            <span style="font-size: 13px; color: #2E7D32;">التحويل عبر ماي كاشي (MyCashy)</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">📞 رقم المحول</label>
+                                <input type="tel" id="mycashyPhone" placeholder="0912345678" style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">💰 المبلغ</label>
+                                <input type="text" id="mycashyAmount" value="500" readonly style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); font-weight: 700; outline: none; font-size: 14px;">
+                            </div>
+                        </div>
+                        <div style="background: #FFF3CD; padding: 6px 10px; border-radius: 8px; margin-top: 8px; font-size: 12px; color: #856404; text-align: center;">
+                            📞 رقم التحويل: <strong>401793722</strong> · باسم: <strong>محمد فتحي</strong>
+                        </div>
+                    </div>
+
+                    <!-- Bankak Form -->
+                    <div id="bankakForm" style="display: none;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #E3F2FD; padding: 8px 12px; border-radius: 10px;">
+                            <span style="font-size: 16px;">🏦</span>
+                            <span style="font-size: 13px; color: #0D47A1;">التحويل عبر Bankak (بنكك)</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">🔢 رقم الحساب</label>
+                                <input type="text" id="bankakAccount" placeholder="4845774" style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">💰 المبلغ</label>
+                                <input type="text" id="bankakAmount" value="500" readonly style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); font-weight: 700; outline: none; font-size: 14px;">
+                            </div>
+                        </div>
+                        <div style="background: #FFF3CD; padding: 6px 10px; border-radius: 8px; margin-top: 8px; font-size: 12px; color: #856404; text-align: center;">
+                            🔢 رقم الحساب: <strong>4845774</strong> · باسم: <strong>أمنه محمد</strong>
+                        </div>
+                    </div>
+
+                    <!-- Visa Card Form -->
+                    <div id="visaForm" style="display: none;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #F3E5F5; padding: 8px 12px; border-radius: 10px;">
+                            <span style="font-size: 16px;">💳</span>
+                            <span style="font-size: 13px; color: #6A1B9A;">الدفع ببطاقة فيزا كارد</span>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">🔢 رقم البطاقة</label>
+                            <input type="text" id="visaNumber" placeholder="1234 5678 9012 3456" maxlength="19" style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px; font-family: monospace; letter-spacing: 2px;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">📅 تاريخ الانتهاء</label>
+                                <input type="text" id="visaExpiry" placeholder="MM/YY" maxlength="5" style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">🔒 CVV</label>
+                                <input type="password" id="visaCvv" placeholder="123" maxlength="4" style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">💰 المبلغ</label>
+                                <input type="text" id="visaAmount" value="500" readonly style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); font-weight: 700; outline: none; font-size: 14px;">
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                            <span style="font-size: 12px; color: var(--text-secondary);">🛡️ مدفوعات آمنة مشفرة</span>
+                            <span style="font-size: 18px;">🔒</span>
+                        </div>
+                    </div>
+
+                    <!-- ATM Card Form -->
+                    <div id="atmForm" style="display: none;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #E8EAF6; padding: 8px 12px; border-radius: 10px;">
+                            <span style="font-size: 16px;">🏧</span>
+                            <span style="font-size: 13px; color: #283593;">الدفع ببطاقة الصراف الآلي</span>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">🔢 رقم البطاقة</label>
+                            <input type="text" id="atmNumber" placeholder="1234 5678 9012 3456" maxlength="19" style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px; font-family: monospace; letter-spacing: 2px;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">📅 تاريخ الانتهاء</label>
+                                <input type="text" id="atmExpiry" placeholder="MM/YY" maxlength="5" style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">🔒 PIN</label>
+                                <input type="password" id="atmPin" placeholder="****" maxlength="4" style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">💰 المبلغ</label>
+                                <input type="text" id="atmAmount" value="500" readonly style="width: 100%; padding: 8px 10px; border: 2px solid var(--bg); border-radius: 10px; background: var(--card-bg); color: var(--text); font-weight: 700; outline: none; font-size: 14px;">
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                            <span style="font-size: 12px; color: var(--text-secondary);">🏦 مدعوم من جميع البنوك السودانية</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button id="submitPaymentBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #1A237E, #0D47A1); color: white; border: none; border-radius: 14px; font-weight: 700; font-size: 16px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>🔓</span> تأكيد الدفع والاشتراك
+                </button>
+
+                <!-- Security Badge -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 12px; font-size: 11px; color: var(--text-secondary);">
+                    <span>🔒 مشفر 256-bit</span>
+                    <span>•</span>
+                    <span>🛡️ مدفوعات آمنة</span>
+                    <span>•</span>
+                    <span>⏱️ تفعيل خلال 5-30 دقيقة</span>
+                </div>
+
+                <!-- Close Button -->
+                <button id="paymentModalClose" style="width: 100%; padding: 10px; background: none; border: none; color: var(--text-secondary); cursor: pointer; margin-top: 4px; font-size: 14px; transition: var(--transition);">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================
     TOAST CONTAINER
     ============================ -->
     <div class="toast-container" id="toastContainer"></div>
@@ -977,7 +1210,7 @@
         } from './firebase.js';
 
         // =============================================
-        // 1. STATE
+        // STATE
         // =============================================
         let currenciesData = [];
         let currentUser = null;
@@ -991,8 +1224,27 @@
         let unsubscribeCurrencies = null;
         let conversionHistory = JSON.parse(localStorage.getItem('nova_conversion_history') || '[]');
 
+        // Payment State
+        let selectedPlan = 'monthly';
+        let selectedMethod = 'mycashy';
+        let currentPrice = 500;
+        let prices = { monthly: 500, yearly: 4500 };
+
         // =============================================
-        // 2. DOM REFS
+        // PRO FEATURES
+        // =============================================
+        const PRO_FEATURES = {
+            remove_ads: { id: 'remove_ads', name: 'إزالة الإعلانات', nameEn: 'Remove Ads', icon: '🚫' },
+            advanced_alerts: { id: 'advanced_alerts', name: 'تنبيهات متقدمة', nameEn: 'Advanced Alerts', icon: '🔔' },
+            advanced_charts: { id: 'advanced_charts', name: 'رسوم بيانية متقدمة', nameEn: 'Advanced Charts', icon: '📊' },
+            long_history: { id: 'long_history', name: 'تاريخ طويل', nameEn: 'Long History', icon: '📅' },
+            advanced_comparison: { id: 'advanced_comparison', name: 'مقارنات متقدمة', nameEn: 'Advanced Comparison', icon: '⚖️' },
+            premium_themes: { id: 'premium_themes', name: 'ثيمات مميزة', nameEn: 'Premium Themes', icon: '🎨' },
+            future_features: { id: 'future_features', name: 'ميزات مستقبلية', nameEn: 'Future Features', icon: '🚀' }
+        };
+
+        // =============================================
+        // DOM REFS
         // =============================================
         const grid = document.getElementById('currenciesGrid');
         const searchInput = document.getElementById('searchInput');
@@ -1019,21 +1271,17 @@
         const convertedDetail = document.getElementById('convertedDetail');
         const rateDisplay = document.getElementById('rateDisplay');
 
-        // =============================================
-        // 3. PRO FEATURES
-        // =============================================
-        const PRO_FEATURES = {
-            remove_ads: { id: 'remove_ads', name: 'إزالة الإعلانات', nameEn: 'Remove Ads', icon: '🚫' },
-            advanced_alerts: { id: 'advanced_alerts', name: 'تنبيهات متقدمة', nameEn: 'Advanced Alerts', icon: '🔔' },
-            advanced_charts: { id: 'advanced_charts', name: 'رسوم بيانية متقدمة', nameEn: 'Advanced Charts', icon: '📊' },
-            long_history: { id: 'long_history', name: 'تاريخ طويل', nameEn: 'Long History', icon: '📅' },
-            advanced_comparison: { id: 'advanced_comparison', name: 'مقارنات متقدمة', nameEn: 'Advanced Comparison', icon: '⚖️' },
-            premium_themes: { id: 'premium_themes', name: 'ثيمات مميزة', nameEn: 'Premium Themes', icon: '🎨' },
-            future_features: { id: 'future_features', name: 'ميزات مستقبلية', nameEn: 'Future Features', icon: '🚀' }
-        };
+        // Payment DOM
+        const paymentModal = document.getElementById('paymentModal');
+        const paymentModalClose = document.getElementById('paymentModalClose');
+        const submitPaymentBtn = document.getElementById('submitPaymentBtn');
+        const planSelectBtns = document.querySelectorAll('.plan-select-btn');
+        const paymentMethodBtns = document.querySelectorAll('.payment-method-btn');
+        const monthlyPriceDisplay = document.getElementById('monthlyPriceDisplay');
+        const yearlyPriceDisplay = document.getElementById('yearlyPriceDisplay');
 
         // =============================================
-        // 4. TOAST & THEME
+        // TOAST & THEME
         // =============================================
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -1065,7 +1313,7 @@
         });
 
         // =============================================
-        // 5. AUTH FUNCTIONS
+        // AUTH FUNCTIONS
         // =============================================
         function getAuthErrorMessage(code) {
             const messages = {
@@ -1111,7 +1359,7 @@
         }
 
         // =============================================
-        // 6. GOOGLE LOGIN
+        // GOOGLE LOGIN
         // =============================================
         async function handleGoogleLogin() {
             const message = document.getElementById('authMessage');
@@ -1210,7 +1458,6 @@
                 if (emailShort) emailShort.textContent = displayName;
                 loginBtn.style.background = 'var(--success)';
                 checkAdminStatus(user.uid);
-                // تحميل حالة Pro
                 loadProStatus(user.uid);
             } else {
                 if (authForm) authForm.style.display = 'block';
@@ -1240,7 +1487,7 @@
         }
 
         // =============================================
-        // 7. AUTH MODAL
+        // AUTH MODAL
         // =============================================
         function createAuthModal() {
             const modalHTML = `
@@ -1494,7 +1741,7 @@
         }
 
         // =============================================
-        // 8. PRO STATUS
+        // PRO STATUS
         // =============================================
         async function loadProStatus(userId) {
             try {
@@ -1520,7 +1767,6 @@
                 }
 
                 console.log(`📊 Pro status: ${isProUser ? '✅ PRO' : '🔓 FREE'}`);
-                // تحديث الواجهة إذا كانت صفحة Pro مفتوحة
                 if (window.location.hash === '#pro') {
                     loadProPage();
                 }
@@ -1531,7 +1777,7 @@
         }
 
         // =============================================
-        // 9. LOAD CURRENCIES
+        // LOAD CURRENCIES
         // =============================================
         async function loadCurrenciesFromFirestore() {
             try {
@@ -1626,7 +1872,7 @@
         }
 
         // =============================================
-        // 10. RENDER FUNCTIONS
+        // RENDER FUNCTIONS
         // =============================================
         function updateCurrencyCount() {
             const activeCurrencies = currenciesData.filter(c => c.active !== false);
@@ -1734,7 +1980,7 @@
         }
 
         // =============================================
-        // 11. FAVORITES & SEARCH & FILTERS
+        // FAVORITES & SEARCH & FILTERS
         // =============================================
         function toggleFavorite(id) {
             const index = favorites.indexOf(id);
@@ -1773,7 +2019,7 @@
         });
 
         // =============================================
-        // 12. MODAL
+        // MODAL
         // =============================================
         function openModal(currency) {
             modalFlag.textContent = currency.flag || '🏳️';
@@ -1847,7 +2093,7 @@
         });
 
         // =============================================
-        // 13. CONVERTER
+        // CONVERTER
         // =============================================
         function renderConverterOptions() {
             const activeCurrencies = currenciesData.filter(c => c.active !== false);
@@ -2027,7 +2273,7 @@
         });
 
         // =============================================
-        // 14. QUICK AMOUNTS & CURRENCIES
+        // QUICK AMOUNTS & CURRENCIES
         // =============================================
         function setupQuickAmounts() {
             const container = document.getElementById('quickAmounts');
@@ -2084,7 +2330,7 @@
         }
 
         // =============================================
-        // 15. CONVERSION HISTORY
+        // CONVERSION HISTORY
         // =============================================
         function saveConversionHistory(fromCode, toCode, amount, result) {
             const entry = { from: fromCode, to: toCode, amount: amount, result: result, timestamp: new Date().toISOString() };
@@ -2161,7 +2407,7 @@
         });
 
         // =============================================
-        // 16. SET CONVERTER TO
+        // SET CONVERTER TO
         // =============================================
         window.setConverterTo = function(id) {
             const currency = currenciesData.find(c => c.id === id);
@@ -2175,7 +2421,7 @@
         };
 
         // =============================================
-        // 17. NOVA PRO PAGE
+        // NOVA PRO PAGE
         // =============================================
         async function loadProPage() {
             const container = document.getElementById('proPageContainer');
@@ -2196,13 +2442,11 @@
                 return;
             }
 
-            // تحميل حالة Pro إذا لم تكن محملة
             if (!proSubscription) {
                 await loadProStatus(user.uid);
             }
 
             if (isProUser && proPlan) {
-                // عرض Dashboard Pro
                 const endDate = proSubscription.endDate?.toDate?.() || new Date();
                 const remainingDays = Math.max(0, Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24)));
                 const features = proPlan.features || [];
@@ -2255,7 +2499,6 @@
                     </div>
                 `;
             } else {
-                // عرض صفحة الاشتراك
                 await renderProPricing(container);
             }
         }
@@ -2300,7 +2543,7 @@
                                             return `<li>${feat?.icon || '✅'} ${feat?.name || id}</li>`;
                                         }).join('')}
                                     </ul>
-                                    <button class="btn-subscribe" onclick="startSubscription('${plan.id}')">
+                                    <button class="btn-subscribe" onclick="openPaymentModal('${plan.id}')">
                                         ${plan.id === 'monthly' ? '⭐ ابدأ NOVA PRO' : '📅 اشترك سنوياً'}
                                     </button>
                                 </div>
@@ -2320,25 +2563,195 @@
         }
 
         // =============================================
-        // 18. SUBSCRIPTION FUNCTIONS
+        // PAYMENT SYSTEM
         // =============================================
-        window.startSubscription = function(planId) {
+        window.openPaymentModal = function(planId) {
             const user = auth.currentUser;
             if (!user) {
                 showToast('⚠️ الرجاء تسجيل الدخول أولاً', 'error');
                 return;
             }
-            if (!navigator.onLine) {
-                showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
+            
+            selectedPlan = planId || 'monthly';
+            updatePaymentAmount();
+            paymentModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        function updatePaymentAmount() {
+            const amount = selectedPlan === 'monthly' ? prices.monthly : prices.yearly;
+            currentPrice = amount;
+            const formattedAmount = amount.toLocaleString() + ' SDG';
+            
+            document.querySelectorAll('#paymentModal input[readonly]').forEach(el => {
+                el.value = amount;
+            });
+            document.querySelectorAll('#paymentModal .plan-select-btn').forEach(btn => {
+                if (btn.dataset.plan === selectedPlan) {
+                    btn.style.background = 'var(--primary)';
+                    btn.style.color = 'white';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--text-secondary)';
+                }
+            });
+        }
+
+        function switchPaymentForm(method) {
+            document.getElementById('mycashyForm').style.display = method === 'mycashy' ? 'block' : 'none';
+            document.getElementById('bankakForm').style.display = method === 'bankak' ? 'block' : 'none';
+            document.getElementById('visaForm').style.display = method === 'visa' ? 'block' : 'none';
+            document.getElementById('atmForm').style.display = method === 'atm' ? 'block' : 'none';
+        }
+
+        // Payment Events
+        planSelectBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedPlan = btn.dataset.plan;
+                updatePaymentAmount();
+            });
+        });
+
+        paymentMethodBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                paymentMethodBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'var(--bg)';
+                    b.style.color = 'var(--text)';
+                    b.style.borderColor = 'var(--bg)';
+                });
+                btn.classList.add('active');
+                btn.style.background = 'var(--primary)';
+                btn.style.color = 'white';
+                btn.style.borderColor = 'var(--primary)';
+                selectedMethod = btn.dataset.method;
+                switchPaymentForm(selectedMethod);
+            });
+        });
+
+        paymentModalClose.addEventListener('click', () => {
+            paymentModal.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        paymentModal.addEventListener('click', (e) => {
+            if (e.target === paymentModal) {
+                paymentModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        submitPaymentBtn.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) {
+                showToast('⚠️ الرجاء تسجيل الدخول أولاً', 'error');
                 return;
             }
 
-            showToast('⏳ جاري معالجة الاشتراك...', 'info');
-            setTimeout(() => {
-                showToast('📱 سيتم التوجيه إلى صفحة الدفع قريباً', 'info');
-            }, 2000);
-        };
+            // جمع البيانات
+            let paymentData = {
+                userId: user.uid,
+                userEmail: user.email,
+                plan: selectedPlan,
+                amount: currentPrice,
+                currency: 'SDG',
+                method: selectedMethod,
+                status: 'pending',
+                createdAt: serverTimestamp()
+            };
 
+            // إضافة بيانات خاصة بكل طريقة
+            let phone = '';
+            let accountNumber = '';
+            
+            switch (selectedMethod) {
+                case 'mycashy':
+                    phone = document.getElementById('mycashyPhone').value.trim();
+                    if (!phone || phone.length < 10) {
+                        showToast('⚠️ الرجاء إدخال رقم هاتف صحيح', 'error');
+                        return;
+                    }
+                    paymentData.phone = phone;
+                    paymentData.provider = 'MyCashy';
+                    paymentData.providerNumber = '401793722';
+                    break;
+                case 'bankak':
+                    accountNumber = document.getElementById('bankakAccount').value.trim();
+                    if (!accountNumber) {
+                        showToast('⚠️ الرجاء إدخال رقم الحساب', 'error');
+                        return;
+                    }
+                    paymentData.accountNumber = accountNumber;
+                    paymentData.provider = 'Bankak';
+                    paymentData.providerAccount = '4845774';
+                    break;
+                case 'visa':
+                    const visaNumber = document.getElementById('visaNumber').value.trim();
+                    const visaExpiry = document.getElementById('visaExpiry').value.trim();
+                    const visaCvv = document.getElementById('visaCvv').value.trim();
+                    if (!visaNumber || !visaExpiry || !visaCvv) {
+                        showToast('⚠️ الرجاء إدخال جميع بيانات البطاقة', 'error');
+                        return;
+                    }
+                    paymentData.cardNumber = visaNumber;
+                    paymentData.cardExpiry = visaExpiry;
+                    paymentData.provider = 'Visa';
+                    break;
+                case 'atm':
+                    const atmNumber = document.getElementById('atmNumber').value.trim();
+                    const atmExpiry = document.getElementById('atmExpiry').value.trim();
+                    const atmPin = document.getElementById('atmPin').value.trim();
+                    if (!atmNumber || !atmExpiry || !atmPin) {
+                        showToast('⚠️ الرجاء إدخال جميع بيانات البطاقة', 'error');
+                        return;
+                    }
+                    paymentData.cardNumber = atmNumber;
+                    paymentData.cardExpiry = atmExpiry;
+                    paymentData.provider = 'ATM';
+                    break;
+            }
+
+            try {
+                submitPaymentBtn.disabled = true;
+                submitPaymentBtn.textContent = '⏳ جاري الإرسال...';
+
+                // حفظ طلب الدفع في Firestore
+                const docRef = await addDoc(collection(db, 'payment_requests'), paymentData);
+
+                // تسجيل في activity_logs
+                await addDoc(collection(db, 'activity_logs'), {
+                    action: 'PAYMENT_REQUEST',
+                    userId: user.uid,
+                    userEmail: user.email,
+                    amount: currentPrice,
+                    method: selectedMethod,
+                    plan: selectedPlan,
+                    paymentId: docRef.id,
+                    timestamp: serverTimestamp(),
+                    adminEmail: 'pending'
+                });
+
+                showToast('✅ تم إرسال طلب الدفع بنجاح! سيتم تفعيل اشتراكك خلال 5-30 دقيقة', 'success');
+                paymentModal.classList.remove('active');
+                document.body.style.overflow = '';
+
+                // إعادة تعيين النموذج
+                document.querySelectorAll('#paymentModal input').forEach(el => {
+                    if (!el.readOnly) el.value = '';
+                });
+
+            } catch (error) {
+                console.error('❌ Error submitting payment:', error);
+                showToast('❌ حدث خطأ أثناء إرسال طلب الدفع', 'error');
+            } finally {
+                submitPaymentBtn.disabled = false;
+                submitPaymentBtn.innerHTML = '<span>🔓</span> تأكيد الدفع والاشتراك';
+            }
+        });
+
+        // =============================================
+        // RESTORE PURCHASES
+        // =============================================
         window.restorePurchases = function() {
             if (!navigator.onLine) {
                 showToast('⚠️ لا يوجد اتصال بالإنترنت', 'error');
@@ -2347,12 +2760,13 @@
             showToast('🔄 جاري استعادة المشتريات...', 'info');
             setTimeout(() => {
                 showToast('✅ تم استعادة المشتريات بنجاح', 'success');
+                if (currentUser) loadProStatus(currentUser.uid);
                 loadProPage();
             }, 3000);
         };
 
         // =============================================
-        // 19. MOBILE MENU & LOGIN
+        // MOBILE MENU & LOGIN
         // =============================================
         hamburger.addEventListener('click', () => {
             mainNav.classList.toggle('open');
@@ -2380,13 +2794,12 @@
         });
 
         // =============================================
-        // 20. AUTH STATE
+        // AUTH STATE
         // =============================================
         onAuthStateChanged(auth, (user) => {
             updateAuthUI(user);
             if (user) {
                 showToast(`👋 مرحباً ${user.email}`, 'success');
-                // تحميل صفحة Pro إذا كانت مفتوحة
                 if (window.location.hash === '#pro') {
                     setTimeout(loadProPage, 500);
                 }
@@ -2394,7 +2807,7 @@
         });
 
         // =============================================
-        // 21. ADMIN PANEL BUTTON
+        // ADMIN PANEL BUTTON
         // =============================================
         document.addEventListener('click', (e) => {
             if (e.target.id === 'adminPanelBtn' || e.target.closest('#adminPanelBtn')) {
@@ -2403,7 +2816,7 @@
         });
 
         // =============================================
-        // 22. HASH CHANGE
+        // HASH CHANGE
         // =============================================
         window.addEventListener('hashchange', () => {
             if (window.location.hash === '#pro') {
@@ -2416,7 +2829,7 @@
         }
 
         // =============================================
-        // 23. INIT
+        // INIT
         // =============================================
         await handleRedirectResult();
 
@@ -2432,7 +2845,6 @@
         setupQuickCurrencies();
         renderConversionHistory();
 
-        // تحميل صفحة Pro إذا كان الرابط يحتوي على #pro
         if (window.location.hash === '#pro') {
             setTimeout(loadProPage, 800);
         }
@@ -2455,9 +2867,10 @@
             convertCurrency,
             formatNumber,
             isProUser,
-            loadProPage
+            loadProPage,
+            openPaymentModal
         };
     </script>
 
 </body>
-</html>
+                        </html>
