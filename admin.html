@@ -88,9 +88,7 @@
             margin-bottom: 20px;
         }
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
         #loadingScreen h2 {
             color: var(--primary);
@@ -127,14 +125,8 @@
             align-items: center;
             gap: 8px;
         }
-        .sidebar .brand span {
-            color: var(--secondary);
-        }
-        .sidebar .brand small {
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--text-secondary);
-        }
+        .sidebar .brand span { color: var(--secondary); }
+        .sidebar .brand small { font-size: 12px; font-weight: 400; color: var(--text-secondary); }
         .sidebar nav {
             flex: 1;
             padding: 20px 12px;
@@ -158,11 +150,7 @@
             color: white;
             box-shadow: 0 4px 15px rgba(20, 123, 255, 0.25);
         }
-        .sidebar nav a .icon {
-            font-size: 20px;
-            width: 28px;
-            text-align: center;
-        }
+        .sidebar nav a .icon { font-size: 20px; width: 28px; text-align: center; }
         .sidebar .sidebar-footer {
             padding: 20px 24px;
             border-top: 1px solid var(--bg);
@@ -224,10 +212,7 @@
             color: var(--text);
             padding: 4px;
         }
-        .header .left h1 {
-            font-size: 22px;
-            font-weight: 800;
-        }
+        .header .left h1 { font-size: 22px; font-weight: 800; }
         .header .right {
             display: flex;
             align-items: center;
@@ -280,18 +265,10 @@
             display: none;
             animation: fadeUp 0.4s ease;
         }
-        .page-section.active {
-            display: block;
-        }
+        .page-section.active { display: block; }
         @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .page-section h2 {
             font-size: 22px;
@@ -324,19 +301,13 @@
             transform: translateY(-4px);
             border-color: var(--primary);
         }
-        .stat-card .stat-icon {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
+        .stat-card .stat-icon { font-size: 28px; margin-bottom: 8px; }
         .stat-card .stat-number {
             font-size: 28px;
             font-weight: 900;
             color: var(--primary);
         }
-        .stat-card .stat-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
+        .stat-card .stat-label { font-size: 14px; color: var(--text-secondary); }
 
         /* ============================================
            CURRENCY TABLE / GRID
@@ -470,9 +441,7 @@
             align-items: center;
             padding: 20px;
         }
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
         .modal {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -485,14 +454,8 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         @keyframes modalSlide {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
         .modal-header {
             display: flex;
@@ -500,10 +463,7 @@
             align-items: center;
             margin-bottom: 20px;
         }
-        .modal-header h3 {
-            font-size: 20px;
-            font-weight: 800;
-        }
+        .modal-header h3 { font-size: 20px; font-weight: 800; }
         .modal-close {
             background: var(--bg);
             border: none;
@@ -520,9 +480,7 @@
             color: white;
             transform: rotate(90deg);
         }
-        .modal-body .form-group {
-            margin-bottom: 16px;
-        }
+        .modal-body .form-group { margin-bottom: 16px; }
         .modal-body label {
             display: block;
             font-weight: 600;
@@ -595,9 +553,7 @@
             align-items: center;
             padding: 20px;
         }
-        #loginScreen.active {
-            display: flex;
-        }
+        #loginScreen.active { display: flex; }
         .login-box {
             background: var(--card-bg);
             padding: 50px 40px;
@@ -614,9 +570,7 @@
             color: var(--primary);
             margin-bottom: 8px;
         }
-        .login-box .logo span {
-            color: var(--secondary);
-        }
+        .login-box .logo span { color: var(--secondary); }
         .login-box h2 {
             font-size: 24px;
             font-weight: 800;
@@ -680,24 +634,12 @@
             align-items: center;
             gap: 10px;
         }
-        .toast.success {
-            background: var(--success);
-        }
-        .toast.error {
-            background: var(--error);
-        }
-        .toast.info {
-            background: var(--primary);
-        }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--error); }
+        .toast.info { background: var(--primary); }
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         /* ============================================
@@ -708,10 +650,7 @@
             padding: 60px 20px;
             color: var(--text-secondary);
         }
-        .empty-state .icon {
-            font-size: 56px;
-            margin-bottom: 12px;
-        }
+        .empty-state .icon { font-size: 56px; margin-bottom: 12px; }
         .empty-state h3 {
             font-size: 20px;
             color: var(--text);
@@ -726,43 +665,21 @@
                 transform: translateX(110%);
                 width: 280px;
             }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-right: 0;
-                padding: 16px;
-            }
-            .header .left .hamburger {
-                display: block;
-            }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-right: 0; padding: 16px; }
+            .header .left .hamburger { display: block; }
             .stats-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
         }
         @media (max-width: 600px) {
-            .login-box {
-                padding: 30px 20px;
-            }
-            .header .right .user-info .email {
-                display: none;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .stat-card {
-                padding: 16px;
-            }
-            .stat-card .stat-number {
-                font-size: 22px;
-            }
-            .modal {
-                padding: 20px;
-                margin: 10px;
-            }
-            .table-container {
-                padding: 8px;
-            }
+            .login-box { padding: 30px 20px; }
+            .header .right .user-info .email { display: none; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-card { padding: 16px; }
+            .stat-card .stat-number { font-size: 22px; }
+            .modal { padding: 20px; margin: 10px; }
+            .table-container { padding: 8px; }
             .table-container th,
             .table-container td {
                 padding: 8px 10px;
@@ -773,9 +690,7 @@
                 left: 16px;
                 bottom: 16px;
             }
-            .toast {
-                min-width: unset;
-            }
+            .toast { min-width: unset; }
         }
     </style>
 </head>
@@ -822,6 +737,7 @@
             <a href="#" data-page="settings"><span class="icon">⚙️</span> الإعدادات</a>
             <a href="#" data-page="ads"><span class="icon">📢</span> الإعلانات</a>
             <a href="#" data-page="pro"><span class="icon">⭐</span> NOVA PRO</a>
+            <a href="#" data-page="payments"><span class="icon">💳</span> طلبات الدفع</a>
         </nav>
         <div class="sidebar-footer">
             <button id="logoutBtn">🚪 تسجيل الخروج</button>
@@ -1098,18 +1014,14 @@
                 </div>
             </div>
 
-            <!-- خطط الاشتراك -->
             <div class="table-container" style="padding: 24px;">
                 <h3 style="margin-bottom: 16px;">📋 خطط NOVA PRO</h3>
-                <div id="plansContainer">
-                    <!-- يتم التحميل عبر JavaScript -->
-                </div>
+                <div id="plansContainer"></div>
                 <button id="addPlanBtn" class="btn btn-success" style="margin-top:12px; background:var(--success); color:white; border:none; padding:10px 24px; border-radius:12px; cursor:pointer;">
                     ➕ إضافة خطة جديدة
                 </button>
             </div>
 
-            <!-- مستخدمين Pro -->
             <div class="table-container" style="padding:24px; margin-top:16px;">
                 <h3 style="margin-bottom:16px;">👥 مستخدمين NOVA PRO</h3>
                 <div style="overflow-x:auto;">
@@ -1128,6 +1040,50 @@
                     </table>
                 </div>
                 <div id="proUsersEmpty" class="empty-state"><div class="icon">📭</div><h3>لا يوجد مستخدمين Pro</h3></div>
+            </div>
+        </section>
+
+        <!-- ==================== PAYMENT REQUESTS ==================== -->
+        <section id="page-payments" class="page-section">
+            <h2>💳 طلبات الدفع</h2>
+            <p class="subtitle">مراجعة طلبات اشتراك Pro وتفعيلها</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-number" id="pendingPayments">0</div>
+                    <div class="stat-label">طلبات معلقة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="approvedPayments">0</div>
+                    <div class="stat-label">طلبات مفعلة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-number" id="totalRevenue">0 SDG</div>
+                    <div class="stat-label">إجمالي الإيرادات</div>
+                </div>
+            </div>
+
+            <div class="table-container" style="padding: 16px;">
+                <h3 style="margin-bottom: 12px;">📋 طلبات الدفع</h3>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المستخدم</th>
+                                <th>المبلغ</th>
+                                <th>الطريقة</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentRequestsList"></tbody>
+                    </table>
+                </div>
+                <div id="paymentRequestsEmpty" class="empty-state"><div class="icon">📭</div><h3>لا توجد طلبات دفع</h3></div>
             </div>
         </section>
 
@@ -1323,8 +1279,7 @@
             orderBy,
             limit,
             serverTimestamp,
-            onSnapshot,
-            where
+            onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -1366,7 +1321,8 @@
             users: document.getElementById('page-users'),
             settings: document.getElementById('page-settings'),
             ads: document.getElementById('page-ads'),
-            pro: document.getElementById('page-pro')
+            pro: document.getElementById('page-pro'),
+            payments: document.getElementById('page-payments')
         };
 
         const statCurrencies = document.getElementById('statCurrencies');
@@ -1414,7 +1370,6 @@
         const confirmCancelBtn = document.getElementById('confirmCancelBtn');
         const confirmModalClose = document.getElementById('confirmModalClose');
 
-        // Plan Modal
         const planModal = document.getElementById('planModal');
         const planModalTitle = document.getElementById('planModalTitle');
         const planModalClose = document.getElementById('planModalClose');
@@ -1487,6 +1442,7 @@
                 if (page === 'dashboard') loadDashboardData();
                 if (page === 'ads') loadAdsSettings();
                 if (page === 'pro') loadProManagement();
+                if (page === 'payments') loadPaymentRequests();
             });
         });
 
@@ -2086,7 +2042,6 @@
         // ============================================
         async function loadProManagement() {
             try {
-                // تحميل إحصائيات Pro
                 const subsSnap = await getDocs(collection(db, 'subscriptions'));
                 const activeSubs = subsSnap.docs.filter(doc => {
                     const data = doc.data();
@@ -2096,10 +2051,7 @@
                 document.getElementById('proTotalUsers').textContent = subsSnap.size;
                 document.getElementById('proActiveUsers').textContent = activeSubs.length;
 
-                // تحميل الخطط
                 await loadPlans();
-
-                // تحميل مستخدمين Pro
                 await loadProUsers();
 
             } catch (error) {
@@ -2150,7 +2102,6 @@
                 html += `</div>`;
                 container.innerHTML = html;
 
-                // Events للخطة
                 document.querySelectorAll('.edit-plan-btn').forEach(btn => {
                     btn.addEventListener('click', () => openEditPlan(btn.dataset.id));
                 });
@@ -2223,7 +2174,6 @@
 
                 tbody.innerHTML = html;
 
-                // Events
                 document.querySelectorAll('.grant-pro-btn').forEach(btn => {
                     btn.addEventListener('click', () => grantPro(btn.dataset.user));
                 });
@@ -2239,13 +2189,13 @@
         // ============================================
         // 15. PLAN CRUD
         // ============================================
+        let plansCache = [];
+
         function openPlanModal(planId = null) {
             if (planId) {
-                planModalTitle.textContent = '✏️ تعديل الخطة';
-                planSubmitBtn.textContent = '💾 تحديث';
-                // تحميل بيانات الخطة
                 const plan = plansCache.find(p => p.id === planId);
                 if (plan) {
+                    planModalTitle.textContent = '✏️ تعديل الخطة';
                     formPlanId.value = planId;
                     formPlanName.value = plan.name || '';
                     formPlanNameEn.value = plan.nameEn || '';
@@ -2253,10 +2203,10 @@
                     formPlanCurrency.value = plan.currency || 'SDG';
                     formPlanPeriod.value = plan.billingPeriod || 'monthly';
                     formPlanStatus.value = plan.active !== false ? 'active' : 'inactive';
-                    // تحديد المميزات
                     document.querySelectorAll('.plan-feature').forEach(cb => {
                         cb.checked = plan.features?.includes(cb.value) || false;
                     });
+                    planSubmitBtn.textContent = '💾 تحديث';
                 }
             } else {
                 planModalTitle.textContent = '📋 إضافة خطة جديدة';
@@ -2333,14 +2283,14 @@
             }
         });
 
-        let plansCache = [];
-
         async function openEditPlan(id) {
             try {
                 const planRef = doc(db, 'plans', id);
                 const planSnap = await getDoc(planRef);
                 if (planSnap.exists()) {
-                    plansCache.push({ id: planSnap.id, ...planSnap.data() });
+                    const plan = { id: planSnap.id, ...planSnap.data() };
+                    plansCache = plansCache.filter(p => p.id !== id);
+                    plansCache.push(plan);
                     openPlanModal(id);
                 }
             } catch (error) {
@@ -2374,7 +2324,6 @@
             if (!planId) return;
 
             try {
-                // التحقق من وجود الخطة
                 const planRef = doc(db, 'plans', planId);
                 const planSnap = await getDoc(planRef);
                 if (!planSnap.exists()) {
@@ -2436,7 +2385,187 @@
         }
 
         // ============================================
-        // 17. REALTIME LISTENERS
+        // 17. PAYMENT REQUESTS
+        // ============================================
+        async function loadPaymentRequests() {
+            try {
+                const q = query(collection(db, 'payment_requests'), orderBy('createdAt', 'desc'));
+                const snapshot = await getDocs(q);
+
+                const pending = snapshot.docs.filter(d => d.data().status === 'pending');
+                const approved = snapshot.docs.filter(d => d.data().status === 'approved');
+
+                document.getElementById('pendingPayments').textContent = pending.length;
+                document.getElementById('approvedPayments').textContent = approved.length;
+
+                let totalRevenue = 0;
+                approved.forEach(doc => {
+                    totalRevenue += doc.data().amount || 0;
+                });
+                document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString() + ' SDG';
+
+                const tbody = document.getElementById('paymentRequestsList');
+                const empty = document.getElementById('paymentRequestsEmpty');
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
+
+                empty.style.display = 'none';
+                let html = '';
+
+                for (const doc of snapshot.docs) {
+                    const data = doc.data();
+
+                    let userEmail = data.userEmail || data.userId || '—';
+                    if (!data.userEmail && data.userId) {
+                        try {
+                            const userRef = doc(db, 'users', data.userId);
+                            const userSnap = await getDoc(userRef);
+                            if (userSnap.exists()) {
+                                userEmail = userSnap.data().email || data.userId;
+                            }
+                        } catch (e) {}
+                    }
+
+                    const date = data.createdAt?.toDate?.() || new Date();
+
+                    const statusMap = {
+                        'pending': '⏳ قيد المراجعة',
+                        'approved': '✅ مفعل',
+                        'rejected': '❌ مرفوض'
+                    };
+
+                    const methodMap = {
+                        'mycashy': '📱 ماي كاشي',
+                        'bankak': '🏦 Bankak',
+                        'visa': '💳 فيزا كارد',
+                        'atm': '🏧 صراف آلي'
+                    };
+
+                    const status = data.status || 'pending';
+                    const method = methodMap[data.method] || data.method || '—';
+
+                    html += `
+                        <tr>
+                            <td>${userEmail}</td>
+                            <td><strong>${data.amount} ${data.currency || 'SDG'}</strong></td>
+                            <td>${method}</td>
+                            <td><span style="color:${status === 'pending' ? '#F59E0B' : status === 'approved' ? 'var(--success)' : 'var(--error)'}">${statusMap[status] || status}</span></td>
+                            <td>${date.toLocaleString('ar')}</td>
+                            <td>
+                                ${status === 'pending' ? `
+                                    <button onclick="window.approvePayment('${doc.id}')" style="padding:4px 12px; border:none; border-radius:8px; background:var(--success); color:white; cursor:pointer; font-size:12px;">
+                                        ✅ تفعيل
+                                    </button>
+                                    <button onclick="window.rejectPayment('${doc.id}')" style="padding:4px 12px; border:none; border-radius:8px; background:var(--error); color:white; cursor:pointer; font-size:12px;">
+                                        ❌ رفض
+                                    </button>
+                                ` : status === 'approved' ? '✅ مفعل' : '❌ مرفوض'}
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                tbody.innerHTML = html;
+
+            } catch (error) {
+                console.error('❌ Error loading payment requests:', error);
+            }
+        }
+
+        window.approvePayment = async function(paymentId) {
+            if (!confirm('هل أنت متأكد من تفعيل هذا الاشتراك؟')) return;
+
+            try {
+                const paymentRef = doc(db, 'payment_requests', paymentId);
+                const paymentSnap = await getDoc(paymentRef);
+
+                if (!paymentSnap.exists()) {
+                    showToast('⚠️ طلب الدفع غير موجود', 'error');
+                    return;
+                }
+
+                const data = paymentSnap.data();
+
+                await updateDoc(paymentRef, {
+                    status: 'approved',
+                    approvedAt: serverTimestamp(),
+                    approvedBy: ADMIN_EMAIL
+                });
+
+                const userId = data.userId;
+                const planId = data.plan || 'monthly';
+                const days = planId === 'yearly' ? 365 : 30;
+
+                await grantProDirect(userId, planId, days, `مدفوع عبر ${data.method || 'غير معروف'}`);
+
+                await addActivityLog('PAYMENT_APPROVED', paymentId, `تفعيل اشتراك Pro - ${data.amount} ${data.currency}`);
+                showToast('✅ تم تفعيل الاشتراك بنجاح', 'success');
+                loadPaymentRequests();
+                loadProManagement();
+
+            } catch (error) {
+                console.error('❌ Error approving payment:', error);
+                showToast('❌ حدث خطأ أثناء التفعيل', 'error');
+            }
+        };
+
+        window.rejectPayment = async function(paymentId) {
+            if (!confirm('هل أنت متأكد من رفض هذا الطلب؟')) return;
+
+            try {
+                await updateDoc(doc(db, 'payment_requests', paymentId), {
+                    status: 'rejected',
+                    rejectedAt: serverTimestamp(),
+                    rejectedBy: ADMIN_EMAIL
+                });
+
+                await addActivityLog('PAYMENT_REJECTED', paymentId, 'رفض طلب اشتراك Pro');
+                showToast('❌ تم رفض الطلب', 'info');
+                loadPaymentRequests();
+
+            } catch (error) {
+                console.error('❌ Error rejecting payment:', error);
+                showToast('❌ حدث خطأ أثناء الرفض', 'error');
+            }
+        };
+
+        async function grantProDirect(userId, planId, days, provider) {
+            try {
+                const planRef = doc(db, 'plans', planId);
+                const planSnap = await getDoc(planRef);
+                if (!planSnap.exists()) return;
+
+                const plan = planSnap.data();
+                const startDate = new Date();
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + days);
+
+                const subRef = doc(db, 'subscriptions', userId);
+                await setDoc(subRef, {
+                    userId: userId,
+                    planId: planId,
+                    status: 'active',
+                    startDate: serverTimestamp(),
+                    endDate: endDate,
+                    autoRenew: false,
+                    provider: provider || 'manual',
+                    features: plan.features || [],
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+
+                await addActivityLog('GRANT_PRO_AUTO', userId, `منح Pro تلقائي - ${days} يوم عبر ${provider}`);
+            } catch (error) {
+                console.error('❌ Error in grantProDirect:', error);
+            }
+        }
+
+        // ============================================
+        // 18. REALTIME LISTENERS
         // ============================================
         function startRealtimeListeners() {
             if (window.unsubscribeCurrencies) window.unsubscribeCurrencies();
@@ -2477,7 +2606,7 @@
         }
 
         // ============================================
-        // 18. INIT
+        // 19. INIT
         // ============================================
         console.log('🚀 NOVA Currency Admin Panel جاهز!');
         console.log(`👤 المدير: ${ADMIN_EMAIL}`);
@@ -2492,11 +2621,14 @@
             loadSettings,
             loadAdsSettings,
             loadProManagement,
+            loadPaymentRequests,
             addActivityLog,
             showToast,
             grantPro,
-            revokePro
+            revokePro,
+            approvePayment: window.approvePayment,
+            rejectPayment: window.rejectPayment
         };
     </script>
 </body>
-    </html>
+                                                                                                           </html>
