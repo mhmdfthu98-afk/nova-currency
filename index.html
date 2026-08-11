@@ -1036,485 +1036,882 @@
     <!-- ============================
     JAVASCRIPT
     ============================ -->
-    <script type="module">
-import { auth, db, onAuthStateChanged } from './firebase.js';
-        // =============================================
-        // 1. DATA
-        // =============================================
-        const currenciesData = [{
-            id: 'usd',
-            code: 'USD',
-            name: 'الدولار الأمريكي',
-            flag: '🇺🇸',
-            country: 'الولايات المتحدة',
-            official: { buy: 1680, sell: 1700 },
-            parallel: { buy: 1850, sell: 1880 },
-            change: 2.4,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'eur',
-            code: 'EUR',
-            name: 'اليورو',
-            flag: '🇪🇺',
-            country: 'الاتحاد الأوروبي',
-            official: { buy: 1850, sell: 1875 },
-            parallel: { buy: 2050, sell: 2080 },
-            change: -1.2,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'gbp',
-            code: 'GBP',
-            name: 'الجنيه الإسترليني',
-            flag: '🇬🇧',
-            country: 'المملكة المتحدة',
-            official: { buy: 2150, sell: 2180 },
-            parallel: { buy: 2380, sell: 2410 },
-            change: 0.8,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'sar',
-            code: 'SAR',
-            name: 'الريال السعودي',
-            flag: '🇸🇦',
-            country: 'السعودية',
-            official: { buy: 448, sell: 452 },
-            parallel: { buy: 495, sell: 500 },
-            change: 0.3,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'aed',
-            code: 'AED',
-            name: 'الدرهم الإماراتي',
-            flag: '🇦🇪',
-            country: 'الإمارات',
-            official: { buy: 457, sell: 461 },
-            parallel: { buy: 505, sell: 510 },
-            change: -0.5,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'egp',
-            code: 'EGP',
-            name: 'الجنيه المصري',
-            flag: '🇪🇬',
-            country: 'مصر',
-            official: { buy: 54, sell: 55 },
-            parallel: { buy: 60, sell: 61 },
-            change: 1.5,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'qar',
-            code: 'QAR',
-            name: 'الريال القطري',
-            flag: '🇶🇦',
-            country: 'قطر',
-            official: { buy: 461, sell: 465 },
-            parallel: { buy: 510, sell: 515 },
-            change: 0.1,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'kwd',
-            code: 'KWD',
-            name: 'الدينار الكويتي',
-            flag: '🇰🇼',
-            country: 'الكويت',
-            official: { buy: 5480, sell: 5520 },
-            parallel: { buy: 6000, sell: 6050 },
-            change: 0.6,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'try',
-            code: 'TRY',
-            name: 'الليرة التركية',
-            flag: '🇹🇷',
-            country: 'تركيا',
-            official: { buy: 52, sell: 53 },
-            parallel: { buy: 58, sell: 59 },
-            change: -2.1,
-            updatedAt: new Date().toLocaleString('ar')
-        }, {
-            id: 'cny',
-            code: 'CNY',
-            name: 'اليوان الصيني',
-            flag: '🇨🇳',
-            country: 'الصين',
-            official: { buy: 232, sell: 235 },
-            parallel: { buy: 256, sell: 260 },
-            change: 0.4,
-            updatedAt: new Date().toLocaleString('ar')
-        }];
+             
+                <script type="module">
+// =============================================
+// IMPORTS
+// =============================================
+import { 
+    auth, 
+    db, 
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    sendPasswordResetEmail,
+    signInWithPopup,
+    googleProvider,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    updateDoc,
+    addDoc,
+    query,
+    where,
+    orderBy,
+    onSnapshot,
+    serverTimestamp
+} from './firebase.js';
 
-        // =============================================
-        // 2. STATE
-        // =============================================
-        let currentCurrencyData = [...currenciesData];
-        let favorites = JSON.parse(localStorage.getItem('nova_favorites') || '[]');
-        let currentFilter = 'all';
-        let searchQuery = '';
+// =============================================
+// 1. DATA
+// =============================================
+// بيانات تجريبية (ستُستبدل من Firebase لاحقاً)
+let currenciesData = [
+    {
+        id: 'usd',
+        code: 'USD',
+        name: 'الدولار الأمريكي',
+        nameAr: 'الدولار الأمريكي',
+        flag: '🇺🇸',
+        country: 'الولايات المتحدة',
+        official: { buy: 1680, sell: 1700 },
+        parallel: { buy: 1850, sell: 1880 },
+        change: 2.4,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'eur',
+        code: 'EUR',
+        name: 'اليورو',
+        nameAr: 'اليورو',
+        flag: '🇪🇺',
+        country: 'الاتحاد الأوروبي',
+        official: { buy: 1850, sell: 1875 },
+        parallel: { buy: 2050, sell: 2080 },
+        change: -1.2,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'gbp',
+        code: 'GBP',
+        name: 'الجنيه الإسترليني',
+        nameAr: 'الجنيه الإسترليني',
+        flag: '🇬🇧',
+        country: 'المملكة المتحدة',
+        official: { buy: 2150, sell: 2180 },
+        parallel: { buy: 2380, sell: 2410 },
+        change: 0.8,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'sar',
+        code: 'SAR',
+        name: 'الريال السعودي',
+        nameAr: 'الريال السعودي',
+        flag: '🇸🇦',
+        country: 'السعودية',
+        official: { buy: 448, sell: 452 },
+        parallel: { buy: 495, sell: 500 },
+        change: 0.3,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'aed',
+        code: 'AED',
+        name: 'الدرهم الإماراتي',
+        nameAr: 'الدرهم الإماراتي',
+        flag: '🇦🇪',
+        country: 'الإمارات',
+        official: { buy: 457, sell: 461 },
+        parallel: { buy: 505, sell: 510 },
+        change: -0.5,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'egp',
+        code: 'EGP',
+        name: 'الجنيه المصري',
+        nameAr: 'الجنيه المصري',
+        flag: '🇪🇬',
+        country: 'مصر',
+        official: { buy: 54, sell: 55 },
+        parallel: { buy: 60, sell: 61 },
+        change: 1.5,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'qar',
+        code: 'QAR',
+        name: 'الريال القطري',
+        nameAr: 'الريال القطري',
+        flag: '🇶🇦',
+        country: 'قطر',
+        official: { buy: 461, sell: 465 },
+        parallel: { buy: 510, sell: 515 },
+        change: 0.1,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'kwd',
+        code: 'KWD',
+        name: 'الدينار الكويتي',
+        nameAr: 'الدينار الكويتي',
+        flag: '🇰🇼',
+        country: 'الكويت',
+        official: { buy: 5480, sell: 5520 },
+        parallel: { buy: 6000, sell: 6050 },
+        change: 0.6,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'try',
+        code: 'TRY',
+        name: 'الليرة التركية',
+        nameAr: 'الليرة التركية',
+        flag: '🇹🇷',
+        country: 'تركيا',
+        official: { buy: 52, sell: 53 },
+        parallel: { buy: 58, sell: 59 },
+        change: -2.1,
+        updatedAt: new Date().toLocaleString('ar')
+    },
+    {
+        id: 'cny',
+        code: 'CNY',
+        name: 'اليوان الصيني',
+        nameAr: 'اليوان الصيني',
+        flag: '🇨🇳',
+        country: 'الصين',
+        official: { buy: 232, sell: 235 },
+        parallel: { buy: 256, sell: 260 },
+        change: 0.4,
+        updatedAt: new Date().toLocaleString('ar')
+    }
+];
 
-        // =============================================
-        // 3. DOM REFS
-        // =============================================
-        const grid = document.getElementById('currenciesGrid');
-        const searchInput = document.getElementById('searchInput');
-        const clearSearch = document.getElementById('clearSearch');
-        const themeToggle = document.getElementById('themeToggle');
-        const hamburger = document.getElementById('hamburger');
-        const mainNav = document.getElementById('mainNav');
-        const modal = document.getElementById('currencyModal');
-        const modalClose = document.getElementById('modalClose');
-        const modalFlag = document.getElementById('modalFlag');
-        const modalName = document.getElementById('modalName');
-        const modalBody = document.getElementById('modalBody');
-        const currencyCount = document.getElementById('currencyCount');
-        const toastContainer = document.getElementById('toastContainer');
+// =============================================
+// 2. STATE
+// =============================================
+let currentCurrencyData = [...currenciesData];
+let favorites = JSON.parse(localStorage.getItem('nova_favorites') || '[]');
+let currentFilter = 'all';
+let searchQuery = '';
+let currentUser = null;
+let isAdmin = false;
 
-        // Converter
-        const converterAmount = document.getElementById('converterAmount');
-        const converterFrom = document.getElementById('converterFrom');
-        const converterTo = document.getElementById('converterTo');
-        const converterPriceType = document.getElementById('converterPriceType');
-        const converterMarket = document.getElementById('converterMarket');
-        const swapBtn = document.getElementById('swapCurrencies');
-        const convertedAmount = document.getElementById('convertedAmount');
-        const convertedDetail = document.getElementById('convertedDetail');
+// =============================================
+// 3. DOM REFS
+// =============================================
+const grid = document.getElementById('currenciesGrid');
+const searchInput = document.getElementById('searchInput');
+const clearSearch = document.getElementById('clearSearch');
+const themeToggle = document.getElementById('themeToggle');
+const hamburger = document.getElementById('hamburger');
+const mainNav = document.getElementById('mainNav');
+const modal = document.getElementById('currencyModal');
+const modalClose = document.getElementById('modalClose');
+const modalFlag = document.getElementById('modalFlag');
+const modalName = document.getElementById('modalName');
+const modalBody = document.getElementById('modalBody');
+const currencyCount = document.getElementById('currencyCount');
+const toastContainer = document.getElementById('toastContainer');
+const loginBtn = document.getElementById('loginBtn');
 
-        // =============================================
-        // 4. THEME
-        // =============================================
-        function getTheme() {
-            return localStorage.getItem('nova_theme') || 'light';
-        }
+// Converter
+const converterAmount = document.getElementById('converterAmount');
+const converterFrom = document.getElementById('converterFrom');
+const converterTo = document.getElementById('converterTo');
+const converterPriceType = document.getElementById('converterPriceType');
+const converterMarket = document.getElementById('converterMarket');
+const swapBtn = document.getElementById('swapCurrencies');
+const convertedAmount = document.getElementById('convertedAmount');
+const convertedDetail = document.getElementById('convertedDetail');
 
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('nova_theme', theme);
-            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-
-        // تطبيق الثيم عند التحميل
-        setTheme(getTheme());
-
-        themeToggle.addEventListener('click', () => {
-            const current = getTheme();
-            setTheme(current === 'dark' ? 'light' : 'dark');
-        });
-
-        // =============================================
-        // 5. TOAST
-        // =============================================
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            toastContainer.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(30px)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // =============================================
-        // 6. RENDER CURRENCIES
-        // =============================================
-        function getFilteredData() {
-            let data = [...currentCurrencyData];
-
-            // فلتر المفضلة
-            if (currentFilter === 'favorites') {
-                data = data.filter(c => favorites.includes(c.id));
-            }
-
-            // بحث
-            if (searchQuery.trim()) {
-                const q = searchQuery.trim().toLowerCase();
-                data = data.filter(c =>
-                    c.name.includes(q) ||
-                    c.code.toLowerCase().includes(q) ||
-                    c.country.includes(q)
-                );
-            }
-
-            return data;
-        }
-
-        function renderCurrencies() {
-            const data = getFilteredData();
-            currencyCount.textContent = data.length;
-
-            if (data.length === 0) {
-                grid.innerHTML = `
-                    <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-secondary);">
-                        <div style="font-size:48px; margin-bottom:12px;">🔍</div>
-                        <h3 style="margin-bottom:8px;">لا توجد نتائج</h3>
-                        <p>لم نجد أي عملة تطابق بحثك</p>
+// =============================================
+// 4. AUTH MODAL
+// =============================================
+// إنشاء Modal تسجيل الدخول تلقائياً
+function createAuthModal() {
+    const modalHTML = `
+        <div class="modal-overlay" id="authModal" style="display:none;">
+            <div class="modal" style="max-width:400px;">
+                <div class="modal-header">
+                    <div class="title" style="font-size:20px;">🔑 تسجيل الدخول</div>
+                    <button class="modal-close" id="authModalClose">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div id="authForm">
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">البريد الإلكتروني</label>
+                            <input type="email" id="authEmail" placeholder="example@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;">
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">كلمة المرور</label>
+                            <input type="password" id="authPassword" placeholder="••••••••" style="width:100%;padding:12px 16px;border:2px solid var(--bg);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;">
+                        </div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                            <button id="authLoginBtn" class="btn btn-primary" style="flex:1;">تسجيل الدخول</button>
+                            <button id="authRegisterBtn" class="btn" style="flex:1;background:var(--secondary);color:white;">إنشاء حساب</button>
+                        </div>
+                        <button id="authGoogleBtn" class="btn" style="width:100%;background:#4285F4;color:white;margin-bottom:10px;">🔵 تسجيل الدخول بـ Google</button>
+                        <button id="authResetBtn" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:14px;width:100%;">نسيت كلمة المرور؟</button>
+                        <div id="authMessage" style="margin-top:12px;text-align:center;font-size:14px;color:var(--error);"></div>
                     </div>
-                `;
+                    <div id="authUserInfo" style="display:none;text-align:center;padding:20px;">
+                        <div style="font-size:48px;margin-bottom:12px;">👤</div>
+                        <h3 id="authUserEmail">user@email.com</h3>
+                        <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                            <button id="authLogoutBtn" class="btn" style="background:var(--error);color:white;">تسجيل خروج</button>
+                            ${isAdmin ? '<button id="adminPanelBtn" class="btn btn-primary">⚙️ لوحة الإدارة</button>' : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // إضافة الأحداث
+    const authModal = document.getElementById('authModal');
+    const authModalClose = document.getElementById('authModalClose');
+    
+    authModalClose.addEventListener('click', () => {
+        authModal.style.display = 'none';
+    });
+    
+    authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) authModal.style.display = 'none';
+    });
+    
+    // أحداث النماذج
+    document.getElementById('authLoginBtn').addEventListener('click', handleLogin);
+    document.getElementById('authRegisterBtn').addEventListener('click', handleRegister);
+    document.getElementById('authGoogleBtn').addEventListener('click', handleGoogleLogin);
+    document.getElementById('authResetBtn').addEventListener('click', handleResetPassword);
+    document.getElementById('authLogoutBtn').addEventListener('click', handleLogout);
+    
+    return authModal;
+}
+
+// =============================================
+// 5. AUTH FUNCTIONS
+// =============================================
+async function handleLogin() {
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const message = document.getElementById('authMessage');
+    
+    if (!email || !password) {
+        message.textContent = '⚠️ الرجاء إدخال البريد الإلكتروني وكلمة المرور';
+        return;
+    }
+    
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        message.textContent = '';
+        message.style.color = 'var(--success)';
+        message.textContent = '✅ تم تسجيل الدخول بنجاح';
+        setTimeout(() => {
+            document.getElementById('authModal').style.display = 'none';
+        }, 1000);
+    } catch (error) {
+        message.textContent = `❌ ${getAuthErrorMessage(error.code)}`;
+    }
+}
+
+async function handleRegister() {
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const message = document.getElementById('authMessage');
+    
+    if (!email || !password) {
+        message.textContent = '⚠️ الرجاء إدخال البريد الإلكتروني وكلمة المرور';
+        return;
+    }
+    
+    if (password.length < 6) {
+        message.textContent = '⚠️ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+        return;
+    }
+    
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        message.textContent = '';
+        message.style.color = 'var(--success)';
+        message.textContent = '✅ تم إنشاء الحساب بنجاح';
+        setTimeout(() => {
+            document.getElementById('authModal').style.display = 'none';
+        }, 1000);
+    } catch (error) {
+        message.textContent = `❌ ${getAuthErrorMessage(error.code)}`;
+    }
+}
+
+async function handleGoogleLogin() {
+    const message = document.getElementById('authMessage');
+    try {
+        await signInWithPopup(auth, googleProvider);
+        message.textContent = '';
+        message.style.color = 'var(--success)';
+        message.textContent = '✅ تم تسجيل الدخول بنجاح';
+        setTimeout(() => {
+            document.getElementById('authModal').style.display = 'none';
+        }, 1000);
+    } catch (error) {
+        message.textContent = `❌ ${getAuthErrorMessage(error.code)}`;
+    }
+}
+
+async function handleResetPassword() {
+    const email = document.getElementById('authEmail').value;
+    const message = document.getElementById('authMessage');
+    
+    if (!email) {
+        message.textContent = '⚠️ الرجاء إدخال البريد الإلكتروني';
+        return;
+    }
+    
+    try {
+        await sendPasswordResetEmail(auth, email);
+        message.style.color = 'var(--success)';
+        message.textContent = '✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني';
+    } catch (error) {
+        message.textContent = `❌ ${getAuthErrorMessage(error.code)}`;
+    }
+}
+
+async function handleLogout() {
+    try {
+        await signOut(auth);
+        showToast('تم تسجيل الخروج بنجاح', 'info');
+        document.getElementById('authModal').style.display = 'none';
+    } catch (error) {
+        showToast('حدث خطأ أثناء تسجيل الخروج', 'error');
+    }
+}
+
+function getAuthErrorMessage(code) {
+    const messages = {
+        'auth/user-not-found': 'المستخدم غير موجود',
+        'auth/wrong-password': 'كلمة المرور غير صحيحة',
+        'auth/email-already-in-use': 'البريد الإلكتروني مستخدم بالفعل',
+        'auth/invalid-email': 'البريد الإلكتروني غير صحيح',
+        'auth/weak-password': 'كلمة المرور ضعيفة (6 أحرف على الأقل)',
+        'auth/too-many-requests': 'طلبات كثيرة، حاول لاحقاً',
+        'auth/network-request-failed': 'خطأ في الشبكة، تأكد من الاتصال بالإنترنت'
+    };
+    return messages[code] || 'حدث خطأ غير معروف';
+}
+
+// =============================================
+// 6. AUTH STATE
+// =============================================
+function updateAuthUI(user) {
+    currentUser = user;
+    const authModal = document.getElementById('authModal');
+    if (!authModal) return;
+    
+    const authForm = document.getElementById('authForm');
+    const authUserInfo = document.getElementById('authUserInfo');
+    const authUserEmail = document.getElementById('authUserEmail');
+    
+    if (user) {
+        authForm.style.display = 'none';
+        authUserInfo.style.display = 'block';
+        authUserEmail.textContent = user.email;
+        loginBtn.textContent = `👤 ${user.email.split('@')[0]}`;
+        loginBtn.style.background = 'var(--success)';
+        
+        // التحقق من صلاحية Admin
+        checkAdminStatus(user.uid);
+    } else {
+        authForm.style.display = 'block';
+        authUserInfo.style.display = 'none';
+        loginBtn.textContent = '🔑 تسجيل الدخول';
+        loginBtn.style.background = 'var(--primary)';
+        isAdmin = false;
+    }
+}
+
+async function checkAdminStatus(uid) {
+    try {
+        const adminRef = doc(db, 'admins', uid);
+        const adminSnap = await getDoc(adminRef);
+        isAdmin = adminSnap.exists() && adminSnap.data().active === true;
+        
+        // تحديث واجهة Admin
+        const adminBtn = document.getElementById('adminPanelBtn');
+        if (adminBtn) {
+            adminBtn.style.display = isAdmin ? 'inline-block' : 'none';
+        }
+        
+        if (isAdmin) {
+            console.log('👑 مرحباً Admin');
+        }
+    } catch (error) {
+        console.error('خطأ في التحقق من صلاحية Admin:', error);
+        isAdmin = false;
+    }
+}
+
+// =============================================
+// 7. LISTEN TO AUTH CHANGES
+// =============================================
+onAuthStateChanged(auth, (user) => {
+    updateAuthUI(user);
+    if (user) {
+        showToast(`👋 مرحباً ${user.email}`, 'success');
+    }
+});
+
+// =============================================
+// 8. LOAD CURRENCIES FROM FIRESTORE
+// =============================================
+async function loadCurrenciesFromFirestore() {
+    try {
+        const currenciesRef = collection(db, 'currencies');
+        const querySnapshot = await getDocs(currenciesRef);
+        
+        if (!querySnapshot.empty) {
+            const firestoreData = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                firestoreData.push({
+                    id: doc.id,
+                    code: data.code || doc.id.toUpperCase(),
+                    name: data.nameAr || data.name || doc.id,
+                    nameAr: data.nameAr || data.name || doc.id,
+                    flag: data.flag || '🏳️',
+                    country: data.country || '',
+                    official: data.official || { buy: 0, sell: 0 },
+                    parallel: data.parallel || { buy: 0, sell: 0 },
+                    change: data.change || 0,
+                    updatedAt: data.updatedAt ? new Date(data.updatedAt.toDate()).toLocaleString('ar') : new Date().toLocaleString('ar'),
+                    active: data.active !== false
+                });
+            });
+            
+            if (firestoreData.length > 0) {
+                currentCurrencyData = firestoreData;
+                console.log(`✅ تم تحميل ${firestoreData.length} عملة من Firestore`);
+                renderAll();
                 return;
             }
+        }
+        
+        // إذا لم توجد بيانات في Firestore، استخدم البيانات التجريبية
+        console.log('📝 لا توجد بيانات في Firestore، استخدام البيانات التجريبية');
+        await seedInitialData();
+        currentCurrencyData = currenciesData;
+        renderAll();
+        
+    } catch (error) {
+        console.error('❌ خطأ في تحميل العملات:', error);
+        showToast('⚠️ حدث خطأ في تحميل البيانات', 'error');
+        currentCurrencyData = currenciesData;
+        renderAll();
+    }
+}
 
-            grid.innerHTML = data.map(currency => {
-                const isFavorite = favorites.includes(currency.id);
-                const changeClass = currency.change >= 0 ? 'positive' : 'negative';
-                const changeIcon = currency.change >= 0 ? '↑' : '↓';
-                const market = 'official'; // افتراضي، سيتم التطوير لاحقاً
+// =============================================
+// 9. SEED INITIAL DATA TO FIRESTORE
+// =============================================
+async function seedInitialData() {
+    try {
+        const currenciesRef = collection(db, 'currencies');
+        
+        for (const currency of currenciesData) {
+            const docRef = doc(currenciesRef, currency.id);
+            await setDoc(docRef, {
+                code: currency.code,
+                name: currency.name,
+                nameAr: currency.nameAr,
+                flag: currency.flag,
+                country: currency.country,
+                official: currency.official,
+                parallel: currency.parallel,
+                change: currency.change,
+                active: true,
+                createdAt: serverTimestamp()
+            });
+        }
+        console.log('✅ تم إضافة البيانات التجريبية إلى Firestore');
+        showToast('✅ تم تهيئة قاعدة البيانات', 'success');
+    } catch (error) {
+        console.error('❌ خطأ في إضافة البيانات التجريبية:', error);
+    }
+}
 
-                return `
-                    <div class="currency-card" data-id="${currency.id}">
-                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${currency.id}">
-                            ${isFavorite ? '⭐' : '☆'}
-                        </button>
-                        <div class="top-row">
-                            <span class="flag">${currency.flag}</span>
-                            <div class="info">
-                                <div class="name">${currency.name}</div>
-                                <div class="code">${currency.code} · ${currency.country}</div>
-                            </div>
-                        </div>
-                        <div class="rates">
-                            <div class="rate-item">
-                                <div class="label">شراء</div>
-                                <div class="value">${currency[market]?.buy || '—'}</div>
-                            </div>
-                            <div class="rate-item">
-                                <div class="label">بيع</div>
-                                <div class="value">${currency[market]?.sell || '—'}</div>
-                            </div>
-                        </div>
-                        <div class="bottom-row">
-                            <span class="change ${changeClass}">
-                                ${changeIcon} ${Math.abs(currency.change)}%
-                            </span>
-                            <span class="updated-at">🕐 ${currency.updatedAt}</span>
-                        </div>
+// =============================================
+// 10. THEME
+// =============================================
+function getTheme() {
+    return localStorage.getItem('nova_theme') || 'light';
+}
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('nova_theme', theme);
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+setTheme(getTheme());
+
+themeToggle.addEventListener('click', () => {
+    const current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+// =============================================
+// 11. TOAST
+// =============================================
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    toastContainer.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(30px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// =============================================
+// 12. RENDER CURRENCIES
+// =============================================
+function getFilteredData() {
+    let data = [...currentCurrencyData];
+    
+    if (currentFilter === 'favorites') {
+        data = data.filter(c => favorites.includes(c.id));
+    }
+    
+    if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        data = data.filter(c =>
+            c.name.includes(q) ||
+            c.code.toLowerCase().includes(q) ||
+            c.country.includes(q)
+        );
+    }
+    
+    return data;
+}
+
+function renderCurrencies() {
+    const data = getFilteredData();
+    currencyCount.textContent = data.length;
+    
+    if (data.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-secondary);">
+                <div style="font-size:48px; margin-bottom:12px;">🔍</div>
+                <h3 style="margin-bottom:8px;">لا توجد نتائج</h3>
+                <p>لم نجد أي عملة تطابق بحثك</p>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = data.map(currency => {
+        const isFavorite = favorites.includes(currency.id);
+        const changeClass = currency.change >= 0 ? 'positive' : 'negative';
+        const changeIcon = currency.change >= 0 ? '↑' : '↓';
+        const market = 'official';
+        
+        return `
+            <div class="currency-card" data-id="${currency.id}">
+                <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${currency.id}">
+                    ${isFavorite ? '⭐' : '☆'}
+                </button>
+                <div class="top-row">
+                    <span class="flag">${currency.flag}</span>
+                    <div class="info">
+                        <div class="name">${currency.name}</div>
+                        <div class="code">${currency.code} · ${currency.country}</div>
                     </div>
-                `;
-            }).join('');
-
-            // Events للبطاقات
-            document.querySelectorAll('.currency-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    if (e.target.closest('.favorite-btn')) return;
-                    const id = card.dataset.id;
-                    const currency = currentCurrencyData.find(c => c.id === id);
-                    if (currency) openModal(currency);
-                });
-            });
-
-            // Events لأزرار المفضلة
-            document.querySelectorAll('.favorite-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = btn.dataset.id;
-                    toggleFavorite(id);
-                });
-            });
-        }
-
-        // =============================================
-        // 7. FAVORITES
-        // =============================================
-        function toggleFavorite(id) {
-            const index = favorites.indexOf(id);
-            if (index > -1) {
-                favorites.splice(index, 1);
-                showToast('تمت إزالة العملة من المفضلة', 'info');
-            } else {
-                favorites.push(id);
-                showToast('تمت إضافة العملة إلى المفضلة ⭐', 'success');
-            }
-            localStorage.setItem('nova_favorites', JSON.stringify(favorites));
-            renderCurrencies();
-            renderConverterOptions();
-        }
-
-        // =============================================
-        // 8. SEARCH
-        // =============================================
-        searchInput.addEventListener('input', () => {
-            searchQuery = searchInput.value;
-            clearSearch.classList.toggle('visible', searchQuery.length > 0);
-            renderCurrencies();
-        });
-
-        clearSearch.addEventListener('click', () => {
-            searchInput.value = '';
-            searchQuery = '';
-            clearSearch.classList.remove('visible');
-            renderCurrencies();
-        });
-
-        // =============================================
-        // 9. FILTERS
-        // =============================================
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.filter;
-                renderCurrencies();
-            });
-        });
-
-        // =============================================
-        // 10. MODAL
-        // =============================================
-        function openModal(currency) {
-            modalFlag.textContent = currency.flag;
-            modalName.textContent = `${currency.code} - ${currency.name}`;
-
-            modalBody.innerHTML = `
-                <div class="detail-row">
-                    <span class="label">🇨🇳 البلد</span>
-                    <span class="value">${currency.country}</span>
                 </div>
-                <div class="detail-row">
-                    <span class="label">📈 التغير</span>
-                    <span class="value" style="color:${currency.change >= 0 ? 'var(--success)' : 'var(--error)'}">
-                        ${currency.change >= 0 ? '↑' : '↓'} ${Math.abs(currency.change)}%
+                <div class="rates">
+                    <div class="rate-item">
+                        <div class="label">شراء</div>
+                        <div class="value">${currency[market]?.buy || '—'}</div>
+                    </div>
+                    <div class="rate-item">
+                        <div class="label">بيع</div>
+                        <div class="value">${currency[market]?.sell || '—'}</div>
+                    </div>
+                </div>
+                <div class="bottom-row">
+                    <span class="change ${changeClass}">
+                        ${changeIcon} ${Math.abs(currency.change)}%
                     </span>
+                    <span class="updated-at">🕐 ${currency.updatedAt}</span>
                 </div>
-                <div class="detail-row">
-                    <span class="label">🕐 آخر تحديث</span>
-                    <span class="value">${currency.updatedAt}</span>
-                </div>
-                <div style="margin-top:20px; padding-top:16px; border-top:2px solid var(--bg);">
-                    <h4 style="margin-bottom:12px;">🏦 السوق الرسمي</h4>
-                    <div class="detail-row">
-                        <span class="label">شراء</span>
-                        <span class="value">${currency.official.buy} SDG</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">بيع</span>
-                        <span class="value">${currency.official.sell} SDG</span>
-                    </div>
-                </div>
-                <div style="margin-top:16px; padding-top:16px; border-top:2px solid var(--bg);">
-                    <h4 style="margin-bottom:12px;">💱 السوق الموازي</h4>
-                    <div class="detail-row">
-                        <span class="label">شراء</span>
-                        <span class="value">${currency.parallel.buy} SDG</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">بيع</span>
-                        <span class="value">${currency.parallel.sell} SDG</span>
-                    </div>
-                </div>
-                <div style="margin-top:20px; padding-top:16px; border-top:2px solid var(--bg); text-align:center;">
-                    <button class="btn btn-primary" onclick="document.getElementById('converter').scrollIntoView({behavior:'smooth'})">
-                        🔄 تحويل العملة
-                    </button>
-                </div>
-            `;
-
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        modalClose.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
+            </div>
+        `;
+    }).join('');
+    
+    // Events
+    document.querySelectorAll('.currency-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.favorite-btn')) return;
+            const id = card.dataset.id;
+            const currency = currentCurrencyData.find(c => c.id === id);
+            if (currency) openModal(currency);
         });
-
-        // =============================================
-        // 11. CONVERTER
-        // =============================================
-        function renderConverterOptions() {
-            const options = currentCurrencyData.map(c =>
-                `<option value="${c.id}">${c.flag} ${c.code}</option>`
-            ).join('');
-
-            converterFrom.innerHTML = options;
-            converterTo.innerHTML = options;
-            converterFrom.value = 'usd';
-            converterTo.value = 'sar';
-        }
-
-        function convertCurrency() {
-            const fromId = converterFrom.value;
-            const toId = converterTo.value;
-            const amount = parseFloat(converterAmount.value) || 0;
-            const priceType = converterPriceType.value;
-            const market = converterMarket.value;
-
-            const fromCurrency = currentCurrencyData.find(c => c.id === fromId);
-            const toCurrency = currentCurrencyData.find(c => c.id === toId);
-
-            if (!fromCurrency || !toCurrency) {
-                convertedAmount.textContent = '0.00';
-                convertedDetail.textContent = '⚠️ عملة غير متوفرة';
-                return;
-            }
-
-            const fromRate = fromCurrency[market]?.[priceType] || 0;
-            const toRate = toCurrency[market]?.[priceType] || 0;
-
-            if (fromRate === 0 || toRate === 0) {
-                convertedAmount.textContent = '0.00';
-                convertedDetail.textContent = '⚠️ السعر غير متوفر';
-                return;
-            }
-
-            const result = (amount / fromRate) * toRate;
-            convertedAmount.textContent = result.toFixed(2);
-            convertedDetail.textContent = `${toCurrency.code} (${priceType === 'buy' ? 'شراء' : 'بيع'} - ${market === 'official' ? 'رسمي' : 'موازي'})`;
-        }
-
-        // Converter Events
-        converterAmount.addEventListener('input', convertCurrency);
-        converterFrom.addEventListener('change', convertCurrency);
-        converterTo.addEventListener('change', convertCurrency);
-        converterPriceType.addEventListener('change', convertCurrency);
-        converterMarket.addEventListener('change', convertCurrency);
-
-        swapBtn.addEventListener('click', () => {
-            const temp = converterFrom.value;
-            converterFrom.value = converterTo.value;
-            converterTo.value = temp;
-            convertCurrency();
-            showToast('🔄 تم تبديل العملات', 'info');
+    });
+    
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            toggleFavorite(id);
         });
+    });
+}
 
-        // =============================================
-        // 12. MOBILE MENU
-        // =============================================
-        hamburger.addEventListener('click', () => {
-            mainNav.classList.toggle('open');
-            hamburger.textContent = mainNav.classList.contains('open') ? '✕' : '☰';
-        });
+// =============================================
+// 13. FAVORITES
+// =============================================
+function toggleFavorite(id) {
+    const index = favorites.indexOf(id);
+    if (index > -1) {
+        favorites.splice(index, 1);
+        showToast('تمت إزالة العملة من المفضلة', 'info');
+    } else {
+        favorites.push(id);
+        showToast('تمت إضافة العملة إلى المفضلة ⭐', 'success');
+    }
+    localStorage.setItem('nova_favorites', JSON.stringify(favorites));
+    renderCurrencies();
+    renderConverterOptions();
+}
 
-        // Close menu on link click
-        mainNav.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                mainNav.classList.remove('open');
-                hamburger.textContent = '☰';
-            });
-        });
+// =============================================
+// 14. SEARCH
+// =============================================
+searchInput.addEventListener('input', () => {
+    searchQuery = searchInput.value;
+    clearSearch.classList.toggle('visible', searchQuery.length > 0);
+    renderCurrencies();
+});
 
-        // =============================================
-        // 13. INIT
-        // =============================================
-        renderConverterOptions();
+clearSearch.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    clearSearch.classList.remove('visible');
+    renderCurrencies();
+});
+
+// =============================================
+// 15. FILTERS
+// =============================================
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
         renderCurrencies();
-        convertCurrency();
+    });
+});
 
-        // تحديث المحول عند تغير البيانات
-        console.log('🚀 NOVA RATE جاهز!');
-        console.log(`📊 ${currentCurrencyData.length} عملة متاحة`);
-        console.log(`⭐ ${favorites.length} عملة في المفضلة`);
+// =============================================
+// 16. MODAL
+// =============================================
+function openModal(currency) {
+    modalFlag.textContent = currency.flag;
+    modalName.textContent = `${currency.code} - ${currency.name}`;
+    
+    modalBody.innerHTML = `
+        <div class="detail-row">
+            <span class="label">🇨🇳 البلد</span>
+            <span class="value">${currency.country}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">📈 التغير</span>
+            <span class="value" style="color:${currency.change >= 0 ? 'var(--success)' : 'var(--error)'}">
+                ${currency.change >= 0 ? '↑' : '↓'} ${Math.abs(currency.change)}%
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="label">🕐 آخر تحديث</span>
+            <span class="value">${currency.updatedAt}</span>
+        </div>
+        <div style="margin-top:20px; padding-top:16px; border-top:2px solid var(--bg);">
+            <h4 style="margin-bottom:12px;">🏦 السوق الرسمي</h4>
+            <div class="detail-row">
+                <span class="label">شراء</span>
+                <span class="value">${currency.official.buy} SDG</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">بيع</span>
+                <span class="value">${currency.official.sell} SDG</span>
+            </div>
+        </div>
+        <div style="margin-top:16px; padding-top:16px; border-top:2px solid var(--bg);">
+            <h4 style="margin-bottom:12px;">💱 السوق الموازي</h4>
+            <div class="detail-row">
+                <span class="label">شراء</span>
+                <span class="value">${currency.parallel.buy} SDG</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">بيع</span>
+                <span class="value">${currency.parallel.sell} SDG</span>
+            </div>
+        </div>
+        <div style="margin-top:20px; padding-top:16px; border-top:2px solid var(--bg); text-align:center;">
+            <button class="btn btn-primary" onclick="document.getElementById('converter').scrollIntoView({behavior:'smooth'})">
+                🔄 تحويل العملة
+            </button>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
 
-        // Expose للـ Console للتطوير
-        window.__nova = {
-            currencies: currentCurrencyData,
-            favorites,
-            toggleFavorite,
-            renderCurrencies
-        };
+function closeModal() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+});
+
+// =============================================
+// 17. CONVERTER
+// =============================================
+function renderConverterOptions() {
+    const options = currentCurrencyData.map(c =>
+        `<option value="${c.id}">${c.flag} ${c.code}</option>`
+    ).join('');
+    
+    converterFrom.innerHTML = options;
+    converterTo.innerHTML = options;
+    converterFrom.value = 'usd';
+    converterTo.value = 'sar';
+}
+
+function convertCurrency() {
+    const fromId = converterFrom.value;
+    const toId = converterTo.value;
+    const amount = parseFloat(converterAmount.value) || 0;
+    const priceType = converterPriceType.value;
+    const market = converterMarket.value;
+    
+    const fromCurrency = currentCurrencyData.find(c => c.id === fromId);
+    const toCurrency = currentCurrencyData.find(c => c.id === toId);
+    
+    if (!fromCurrency || !toCurrency) {
+        convertedAmount.textContent = '0.00';
+        convertedDetail.textContent = '⚠️ عملة غير متوفرة';
+        return;
+    }
+    
+    const fromRate = fromCurrency[market]?.[priceType] || 0;
+    const toRate = toCurrency[market]?.[priceType] || 0;
+    
+    if (fromRate === 0 || toRate === 0) {
+        convertedAmount.textContent = '0.00';
+        convertedDetail.textContent = '⚠️ السعر غير متوفر';
+        return;
+    }
+    
+    const result = (amount / fromRate) * toRate;
+    convertedAmount.textContent = result.toFixed(2);
+    convertedDetail.textContent = `${toCurrency.code} (${priceType === 'buy' ? 'شراء' : 'بيع'} - ${market === 'official' ? 'رسمي' : 'موازي'})`;
+}
+
+converterAmount.addEventListener('input', convertCurrency);
+converterFrom.addEventListener('change', convertCurrency);
+converterTo.addEventListener('change', convertCurrency);
+converterPriceType.addEventListener('change', convertCurrency);
+converterMarket.addEventListener('change', convertCurrency);
+
+swapBtn.addEventListener('click', () => {
+    const temp = converterFrom.value;
+    converterFrom.value = converterTo.value;
+    converterTo.value = temp;
+    convertCurrency();
+    showToast('🔄 تم تبديل العملات', 'info');
+});
+
+// =============================================
+// 18. MOBILE MENU
+// =============================================
+hamburger.addEventListener('click', () => {
+    mainNav.classList.toggle('open');
+    hamburger.textContent = mainNav.classList.contains('open') ? '✕' : '☰';
+});
+
+mainNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+        mainNav.classList.remove('open');
+        hamburger.textContent = '☰';
+    });
+});
+
+// =============================================
+// 19. LOGIN BUTTON
+// =============================================
+loginBtn.addEventListener('click', () => {
+    const authModal = document.getElementById('authModal');
+    if (!authModal) {
+        createAuthModal();
+        document.getElementById('authModal').style.display = 'flex';
+    } else {
+        authModal.style.display = 'flex';
+    }
+});
+
+// =============================================
+// 20. ADMIN PANEL BUTTON
+// =============================================
+// سنضيف هذا لاحقاً في المرحلة 12
+
+// =============================================
+// 21. RENDER ALL
+// =============================================
+function renderAll() {
+    renderConverterOptions();
+    renderCurrencies();
+    convertCurrency();
+}
+
+// =============================================
+// 22. INIT
+// =============================================
+// إنشاء Modal تسجيل الدخول
+createAuthModal();
+
+// تحميل البيانات من Firestore
+await loadCurrenciesFromFirestore();
+
+// تحديث المحول
+renderAll();
+
+console.log('🚀 NOVA RATE جاهز مع Firebase!');
+console.log(`📊 ${currentCurrencyData.length} عملة متاحة`);
+console.log(`⭐ ${favorites.length} عملة في المفضلة`);
+console.log(`👤 المستخدم: ${currentUser ? currentUser.email : 'غير مسجل'}`);
+
+// Expose للـ Console
+window.__nova = {
+    currencies: currentCurrencyData,
+    favorites,
+    toggleFavorite,
+    renderCurrencies,
+    auth,
+    db,
+    currentUser
+};
     </script>
+
 </body>
 </html>
