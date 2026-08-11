@@ -1,5 +1,7 @@
 // Firebase Configuration
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+// Firebase Auth
 import { 
     getAuth, 
     signInWithEmailAndPassword, 
@@ -8,8 +10,12 @@ import {
     sendPasswordResetEmail,
     onAuthStateChanged,
     GoogleAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// Firebase Firestore
 import { 
     getFirestore, 
     collection, 
@@ -28,6 +34,15 @@ import {
     Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// Firebase Storage
+import { 
+    getStorage, 
+    ref, 
+    uploadBytes, 
+    getDownloadURL, 
+    deleteObject 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
 // إعدادات Firebase من مشروعك
 const firebaseConfig = {
     apiKey: "AIzaSyAmiuvUSKY-UPL_oD7FOgQUOUh1-lRUANo",
@@ -43,20 +58,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
-// تصدير الخدمات
+// تصدير جميع الخدمات
 export { 
     auth, 
-    db, 
+    db,
+    storage,
+    googleProvider,
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     signOut,
     sendPasswordResetEmail,
     onAuthStateChanged,
-    GoogleAuthProvider,
     signInWithPopup,
-    googleProvider,
+    signInWithRedirect,
+    getRedirectResult,
     collection, 
     doc, 
     getDoc, 
@@ -70,5 +88,9 @@ export {
     orderBy, 
     onSnapshot,
     serverTimestamp,
-    Timestamp
+    Timestamp,
+    ref,
+    uploadBytes,
+    getDownloadURL,
+    deleteObject
 };
